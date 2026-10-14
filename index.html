@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Âmbar · Perfumes, Tênis e Bijuterias</title>
+<meta name="description" content="Prévia de loja virtual: perfumes árabes, tênis e bijuterias, com pedido pelo WhatsApp.">
+<meta name="theme-color" content="#120d0a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23120d0a'/%3E%3Cpath d='M16 6l9 20h-4l-1.8-4h-6.4L11 26H7zm-1.9 12h3.8L16 13.6z' fill='%23c9a25a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Albert+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --oud: #120d0a;        /* 3D stages */
+  --ivory: #ece5da;      /* product grids, same tone as the product photos */
+  --paper: #f6f1e9;
+  --ink: #1b1511;
+  --ink-soft: #6b5f53;
+  --gold: #c9a25a;
+  --gold-deep: #9c7633;
+  --cream: #efe6d6;
+  --line-dark: rgba(239, 230, 214, 0.14);
+  --line: rgba(27, 21, 17, 0.12);
+  --f-display: "Marcellus", "Trajan Pro", Georgia, serif;
+  --f-body: "Albert Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
+  --gl: max(20px, env(safe-area-inset-left, 0px));
+  --gr: max(20px, env(safe-area-inset-right, 0px));
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--oud); color: var(--cream); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+img { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+.wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-left: var(--gl); padding-right: var(--gr); }
+.eyebrow { font: 500 11px/1.4 var(--f-mono); letter-spacing: .22em; text-transform: uppercase; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* 3D canvas sits behind the pinned stages */
+#gl { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100lvh; z-index: 0; display: block; }
+
+/* header */
+.top { position: fixed; z-index: 30; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px); transition: background-color .35s, color .35s, border-color .35s; border-bottom: 1px solid transparent; }
+.top .wrap { height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.top.solid { background: rgba(18, 13, 10, .82); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom-color: var(--line-dark); }
+.top.light { background: rgba(246, 241, 233, .88); color: var(--ink); border-bottom-color: var(--line); }
+.logo { font: 400 24px/1 var(--f-display); letter-spacing: .28em; text-decoration: none; }
+.logo small { display: block; font: 500 9px/1.4 var(--f-mono); letter-spacing: .26em; opacity: .65; margin-top: 4px; }
+.top nav { display: flex; align-items: center; gap: 26px; font-size: 14px; }
+.top nav a { text-decoration: none; opacity: .75; transition: opacity .2s; }
+.top nav a:hover, .top nav a.on { opacity: 1; }
+.cart-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--gold); color: var(--ink); border: 0; padding: 10px 14px; border-radius: 999px; font-weight: 600; font-size: 14px; cursor: pointer; }
+.cart-btn svg { width: 18px; height: 18px; }
+.cart-btn b { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--ink); color: var(--cream); font: 500 12px/22px var(--f-mono); text-align: center; }
+
+/* pinned 3D stages */
+.stage { position: relative; z-index: 1; }
+.stage .pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.stage .copy { position: absolute; inset: 0; pointer-events: none; }
+.step { position: absolute; inset: 0; display: flex; align-items: center; padding-top: 68px; opacity: 0; transition: opacity .6s ease; pointer-events: none; }
+.step .in { max-width: 520px; transform: translateY(24px); transition: transform .6s ease; }
+.step.on { opacity: 1; }
+.step.on .in { transform: none; }
+.step:not(.on) a, .step:not(.on) button { pointer-events: none !important; }
+.step h1, .step h2 { font-size: clamp(2.6rem, 6.4vw, 5.4rem); line-height: .98; margin-top: 16px; }
+.step p { margin-top: 18px; color: rgba(239, 230, 214, .78); max-width: 40ch; font-size: 1.05rem; }
+.step .eyebrow { color: var(--gold); }
+.step .cta { pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; background: var(--gold); color: var(--ink); text-decoration: none; font-weight: 600; padding: 16px 22px; border-radius: 999px; }
+.step .cta-line { pointer-events: auto; display: inline-flex; margin-top: 28px; margin-left: 10px; color: var(--cream); text-decoration: none; font-weight: 600; padding: 15px 20px; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(239, 230, 214, .4); }
+.meter { position: absolute; left: var(--gl); right: var(--gr); bottom: calc(26px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 14px; font: 500 10.5px/1 var(--f-mono); letter-spacing: .18em; text-transform: uppercase; color: rgba(239, 230, 214, .6); }
+.meter .bar { flex: 1; max-width: 220px; height: 1px; background: var(--line-dark); position: relative; }
+.meter .bar i { position: absolute; inset: 0; background: var(--gold); transform-origin: left; transform: scaleX(0); }
+.chips3d { pointer-events: auto; display: flex; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
+.chips3d button { display: inline-flex; align-items: center; gap: 9px; background: rgba(239, 230, 214, .06); border: 1px solid var(--line-dark); color: var(--cream); padding: 10px 14px; border-radius: 999px; cursor: pointer; font-size: 14px; }
+.chips3d button i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+.chips3d button[aria-pressed="true"] { border-color: var(--gold); background: rgba(201, 162, 90, .14); }
+.poster { position: absolute; inset: 0; background: var(--pd) center / cover no-repeat; opacity: 1; transition: opacity 1s; }
+@media (max-width: 760px) { .poster { background-image: var(--pm); } }
+.gl-on .poster { opacity: 0; }
+
+/* product grids */
+.shelf { position: relative; z-index: 2; background: var(--ivory); color: var(--ink); padding-block: clamp(70px, 10vw, 120px); }
+.shelf-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; margin-bottom: 40px; }
+.shelf-head h2 { font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1; }
+.shelf-head .eyebrow { color: var(--gold-deep); }
+.shelf-head p { color: var(--ink-soft); max-width: 44ch; margin: 0; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 22px; }
+.card { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.card-media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--ivory); border-radius: 4px; cursor: pointer; border: 0; padding: 0; width: 100%; }
+.card-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.2, .7, .1, 1); }
+.card-media:hover img { transform: scale(1.04); }
+.card-tag { position: absolute; left: 12px; top: 12px; font: 500 10px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; background: var(--paper); color: var(--ink); padding: 6px 8px; border-radius: 2px; }
+.card-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.card h3 { font: 600 1.02rem/1.3 var(--f-body); letter-spacing: 0; }
+.card .note { color: var(--ink-soft); font-size: .9rem; margin-top: 2px; }
+.price { font: 500 1rem/1 var(--f-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.add { justify-self: start; background: transparent; border: 1px solid var(--ink); color: var(--ink); padding: 10px 14px; border-radius: 999px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background-color .2s, color .2s; }
+.add:hover { background: var(--ink); color: var(--paper); }
+.shelf-note { margin-top: 34px; font: 400 12px/1.6 var(--f-mono); color: var(--ink-soft); }
+
+/* quick view */
+dialog { border: 0; padding: 0; border-radius: 8px; max-width: min(860px, calc(100vw - 24px)); width: 100%; background: var(--paper); color: var(--ink); }
+dialog::backdrop { background: rgba(18, 13, 10, .6); }
+.qv { display: grid; grid-template-columns: 1fr 1fr; }
+.qv img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 5; background: var(--ivory); }
+.qv-body { padding: 30px; display: grid; gap: 16px; align-content: start; min-width: 0; }
+.qv-body h3 { font: 400 2rem/1.05 var(--f-display); }
+.qv-body .eyebrow { color: var(--gold-deep); }
+.qv-body p { margin: 0; color: var(--ink-soft); }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opts button { min-width: 46px; padding: 10px 12px; border: 1px solid var(--line); background: #fff; border-radius: 4px; cursor: pointer; font: 500 14px/1 var(--f-mono); }
+.opts button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.qv-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.btn-dark { background: var(--ink); color: var(--paper); border: 0; padding: 15px 20px; border-radius: 999px; font-weight: 600; cursor: pointer; }
+.btn-x { position: absolute; right: 12px; top: 12px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, .85); cursor: pointer; font-size: 20px; line-height: 1; }
+.hint { font: 400 12px/1.5 var(--f-mono); color: var(--ink-soft); }
+
+/* cart drawer */
+.drawer { position: fixed; z-index: 50; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); background: var(--paper); color: var(--ink); transform: translateX(105%); transition: transform .45s cubic-bezier(.2, .7, .1, 1); display: flex; flex-direction: column; box-shadow: -20px 0 60px rgba(0, 0, 0, .25); padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.drawer.open { transform: none; }
+.scrim { position: fixed; inset: 0; z-index: 49; background: rgba(18, 13, 10, .5); opacity: 0; pointer-events: none; transition: opacity .3s; }
+.scrim.open { opacity: 1; pointer-events: auto; }
+.drawer header { display: flex; justify-content: space-between; align-items: center; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+.drawer header h3 { font: 400 1.6rem/1 var(--f-display); }
+.drawer .items { flex: 1; overflow: auto; padding: 8px 22px; }
+.line { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: center; }
+.line img { width: 64px; height: 80px; object-fit: cover; border-radius: 3px; background: var(--ivory); }
+.line .t { font-weight: 600; font-size: .95rem; }
+.line .v { color: var(--ink-soft); font-size: .85rem; }
+.qty { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; }
+.qty button { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+.empty { padding: 40px 0; color: var(--ink-soft); text-align: center; }
+.drawer footer { padding: 18px 22px 22px; border-top: 1px solid var(--line); display: grid; gap: 12px; }
+.total { display: flex; justify-content: space-between; font: 500 1.1rem/1 var(--f-mono); }
+.wa { display: inline-flex; justify-content: center; align-items: center; gap: 10px; background: #25d366; color: #05301a; border: 0; padding: 16px; border-radius: 999px; font-weight: 700; cursor: pointer; text-decoration: none; }
+.wa svg { width: 20px; height: 20px; }
+
+/* footer */
+.foot { position: relative; z-index: 2; background: var(--oud); color: rgba(239, 230, 214, .7); padding: 60px 0 calc(40px + env(safe-area-inset-bottom, 0px)); }
+.foot .wrap { display: grid; gap: 18px; }
+.foot p { margin: 0; font: 400 12px/1.7 var(--f-mono); max-width: 90ch; }
+.foot a { color: var(--gold); }
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .qv { grid-template-columns: 1fr; }
+  .qv img { aspect-ratio: 1; max-height: 42vh; }
+}
+@media (max-width: 760px) {
+  .top nav a { display: none; }
+  .top .wrap { height: 60px; }
+  .logo { font-size: 20px; }
+  .step { align-items: flex-end; padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  .step h1, .step h2 { font-size: clamp(2.3rem, 11vw, 3.2rem); }
+  .step p { font-size: .98rem; }
+  .step .cta-line { margin-left: 0; }
+  .grid { gap: 22px 14px; }
+  .card h3 { font-size: .95rem; }
+  .card-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .card .note { font-size: .84rem; line-height: 1.4; }
+  .add { padding: 9px 12px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .step { transition: none; } }
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="#perfumes">ÂMBAR<small>Perfumes · Tênis · Bijus</small></a>
+    <nav aria-label="Categorias">
+      <a href="#loja-perfumes" data-sec="perfumes">Perfumes</a>
+      <a href="#loja-tenis" data-sec="tenis">Tênis</a>
+      <a href="#loja-bijus" data-sec="bijus">Bijuterias</a>
+      <button class="cart-btn" id="open-cart" type="button" aria-label="Abrir sacola">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        Sacola <b id="count">0</b>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- 1. perfume -->
+  <section class="stage" id="perfumes" data-stage="perfume" style="height: 380vh">
+    <div class="pin">
+      <div class="poster" style="--pd: url(/img/stage-perfume.webp); --pm: url(/img/stage-perfume-m.webp)"></div>
+      <div class="copy">
+        <div class="step wrap" data-from="0" data-to="0.22"><div class="in">
+          <div class="eyebrow">Perfumes árabes</div>
+          <h1>Oud, âmbar e açafrão</h1>
+          <p>Fragrâncias marcantes, de fixação longa. Role para abrir o frasco.</p>
+        </div></div>
+        <div class="step wrap" data-from="0.24" data-to="0.5"><div class="in">
+          <div class="eyebrow">A tampa</div>
+          <h2>Ouro trabalhado, frasco facetado</h2>
+          <p>Cada perfume vem no frasco tradicional, pronto para presentear.</p>
+        </div></div>
+        <div class="step wrap" data-from="0.52" data-to="0.8"><div class="in">
+          <div class="eyebrow">Uma borrifada</div>
+          <h2>Dura o dia inteiro</h2>
+          <p>Notas de saída cítricas e especiadas, fundo de oud e âmbar.</p>
+        </div></div>
+        <div class="step wrap" data-from="0.82" data-to="1.01"><div class="in">
+          <div class="eyebrow">Na loja do salão</div>
+          <h2>Escolha o seu</h2>
+          <a class="cta" href="#loja-perfumes">Ver os perfumes</a>
+        </div></div>
+      </div>
+      <div class="meter"><span>Perfumes</span><span class="bar"><i></i></span><span class="pct">01 / 03</span></div>
+    </div>
+  </section>
+
+  <section class="shelf" id="loja-perfumes">
+    <div class="wrap">
+      <div class="shelf-head">
+        <div><div class="eyebrow">Perfumes</div><h2>Perfumes árabes</h2></div>
+        <p>Frascos de 100 ml. Toque no produto para ver os detalhes e escolher.</p>
+      </div>
+      <div class="grid" data-cat="perfume"></div>
+    </div>
+  </section>
+
+  <!-- 2. sneakers -->
+  <section class="stage" id="tenis" data-stage="shoe" style="height: 280vh">
+    <div class="pin">
+      <div class="poster" style="--pd: url(/img/stage-shoe.webp); --pm: url(/img/stage-shoe-m.webp)"></div>
+      <div class="copy">
+        <div class="step wrap" data-from="0" data-to="1.01"><div class="in">
+          <div class="eyebrow">Tênis em destaque</div>
+          <h2>Runner, leve para o dia todo</h2>
+          <p>Cabedal em malha respirável e solado macio. Escolha a cor:</p>
+          <div class="chips3d" role="group" aria-label="Cor do tênis">
+            <button type="button" data-variant="midnight" style="--c:#1f6f93" aria-pressed="true"><i></i>Oceano</button>
+            <button type="button" data-variant="beach" style="--c:#c99a93" aria-pressed="false"><i></i>Rosé</button>
+            <button type="button" data-variant="street" style="--c:#1c1c1c" aria-pressed="false"><i></i>Preto</button>
+          </div>
+        </div></div>
+      </div>
+      <div class="meter"><span>Tênis</span><span class="bar"><i></i></span><span class="pct">02 / 03</span></div>
+    </div>
+  </section>
+
+  <section class="shelf" id="loja-tenis">
+    <div class="wrap">
+      <div class="shelf-head">
+        <div><div class="eyebrow">Tênis</div><h2>Tênis</h2></div>
+        <p>Numeração do 34 ao 43. Os modelos do estoque real entram aqui com as fotos da loja.</p>
+      </div>
+      <div class="grid" data-cat="shoe"></div>
+    </div>
+  </section>
+
+  <!-- 3. jewellery -->
+  <section class="stage" id="bijus" data-stage="jewel" style="height: 260vh">
+    <div class="pin">
+      <div class="poster" style="--pd: url(/img/stage-jewel.webp); --pm: url(/img/stage-jewel-m.webp)"></div>
+      <div class="copy">
+        <div class="step wrap" data-from="0" data-to="1.01"><div class="in">
+          <div class="eyebrow">Bijuterias</div>
+          <h2>Argola dourada com gota de esmeralda</h2>
+          <p>Banho dourado e pedras que pegam a luz. Brincos, colares, anéis e pulseiras.</p>
+          <a class="cta" href="#loja-bijus">Ver as bijuterias</a>
+        </div></div>
+      </div>
+      <div class="meter"><span>Bijuterias</span><span class="bar"><i></i></span><span class="pct">03 / 03</span></div>
+    </div>
+  </section>
+
+  <section class="shelf" id="loja-bijus">
+    <div class="wrap">
+      <div class="shelf-head">
+        <div><div class="eyebrow">Bijuterias</div><h2>Bijuterias</h2></div>
+        <p>Peças com banho dourado. Chegam em embalagem para presente.</p>
+      </div>
+      <div class="grid" data-cat="jewel"></div>
+      <p class="shelf-note">Prévia: produtos, nomes e preços são de exemplo. As imagens são ilustrações 3D, não fotos de produtos reais.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a class="logo" href="#perfumes">ÂMBAR<small>Perfumes · Tênis · Bijus</small></a>
+    <p>Prévia de loja virtual para apresentação. Nome, produtos e preços são provisórios. Pedidos saem pelo WhatsApp com a lista pronta. Modelo 3D do tênis: "Materials Variants Shoe" © 2021 Shopify, licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, via Khronos glTF Sample Assets. Frascos e bijuterias modelados para esta prévia.</p>
+  </div>
+</footer>
+
+<dialog id="qv" aria-labelledby="qv-title">
+  <button class="btn-x" type="button" id="qv-close" aria-label="Fechar">×</button>
+  <div class="qv">
+    <img id="qv-img" alt="">
+    <div class="qv-body">
+      <div class="eyebrow" id="qv-cat"></div>
+      <h3 id="qv-title"></h3>
+      <p id="qv-desc"></p>
+      <div class="price" id="qv-price"></div>
+      <div><div class="hint" id="qv-opt-label"></div><div class="opts" id="qv-opts"></div></div>
+      <div class="qv-actions"><button class="btn-dark" id="qv-add" type="button">Adicionar à sacola</button><span class="hint" id="qv-msg" aria-live="polite"></span></div>
+    </div>
+  </div>
+</dialog>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Sacola" aria-hidden="true">
+  <header><h3>Sacola</h3><button class="btn-x" style="position:static" type="button" id="close-cart" aria-label="Fechar sacola">×</button></header>
+  <div class="items" id="items"></div>
+  <footer>
+    <div class="total"><span>Total</span><span id="total">R$ 0,00</span></div>
+    <button class="wa" id="checkout" type="button">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3c.2-.4.2-.9.2-1l-.1-.2z"/></svg>
+      Finalizar pelo WhatsApp
+    </button>
+    <span class="hint">Na prévia, o WhatsApp abre com o pedido pronto para você escolher o contato. Na loja, vai direto para o número do salão.</span>
+  </footer>
+</aside>
+
+<script src="/js/app.js" defer></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="/js/stage.js"></script>
+</body>
+</html>
