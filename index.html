@@ -90,6 +90,13 @@ p { margin: 0; }
 .scroll-cue::after { content: ""; width: 1px; height: 56px; background: linear-gradient(var(--amber), transparent); animation: drip 2s ease-in-out infinite; }
 @keyframes drip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
 
+#hero3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.6s ease; }
+#hero3d.on { opacity: 1; }
+.hero-badge3d { position: absolute; z-index: 4; right: var(--gutter-r); top: 96px; font: 500 10px/1 var(--f-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; opacity: 0; transition: opacity .8s; }
+.hero-badge3d i { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+.hero-badge3d.on { opacity: 1; }
+@media (max-width: 760px) { .hero-badge3d { top: 80px; } }
+
 /* facts strip */
 .facts { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--ink-2); }
 .facts .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
@@ -254,6 +261,7 @@ p { margin: 0; }
         <source srcset="/img/hero_wide.webp" type="image/webp">
         <img src="/img/hero_wide.jpg" alt="Ilustração em 3D de um superesportivo grafite em estúdio escuro, iluminado por luz âmbar" width="2400" height="1350" fetchpriority="high">
       </picture>
+      <canvas id="hero3d" aria-hidden="true"></canvas>
     </div>
     <div class="hero-shade"></div>
     <div class="sweep"></div>
@@ -271,6 +279,7 @@ p { margin: 0; }
       <div class="rating" aria-label="Nota 5,0 de 5 no Google, 9 avaliações"><span class="stars" aria-hidden="true">★★★★★</span><b>5,0</b> no Google · 9 avaliações</div>
     </div>
     <div class="scroll-cue" aria-hidden="true">Role</div>
+    <div class="hero-badge3d" id="badge3d" aria-hidden="true"><i></i>Ilustração 3D em tempo real</div>
   </section>
 
   <section class="facts" aria-label="Informações rápidas">
@@ -545,6 +554,162 @@ p { margin: 0; }
     window.open(url, "_blank", "noopener");
   });
 })();
+</script>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+// Live 3D hero. The rendered poster image stays underneath until the first 3D frame is ready.
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { Reflector } from "three/addons/objects/Reflector.js";
+
+const canvas = document.getElementById("hero3d");
+const hero = document.getElementById("inicio");
+const small = () => innerWidth <= 760;
+if (canvas && !matchMedia("(prefers-reduced-motion: reduce)").matches) { try { start(); } catch (e) { /* the poster image stays */ } }
+
+function start() {
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+
+renderer.setPixelRatio(Math.min(devicePixelRatio, small() ? 1.25 : 1.5));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.35;
+
+const BG = new THREE.Color("#0b0c0d");
+const scene = new THREE.Scene();
+scene.background = BG;
+
+function studioEnv() {
+  const env = new THREE.Scene();
+  const room = new THREE.Mesh(new THREE.BoxGeometry(40, 16, 40), new THREE.MeshBasicMaterial({ color: 0x0a0a0b, side: THREE.BackSide }));
+  room.position.y = 7; env.add(room);
+  const panel = (w, d, x, y, z, color, k, ry = 0, rx = Math.PI / 2) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(k), side: THREE.DoubleSide }));
+    m.position.set(x, y, z); m.rotation.set(rx, ry, 0); env.add(m);
+  };
+  panel(16, 0.45, 0, 7, -1.5, "#ffffff", 8);
+  panel(16, 0.45, 0, 7, 0, "#ffffff", 10);
+  panel(16, 0.45, 0, 7, 1.5, "#ffffff", 8);
+  panel(12, 3.2, 0, 2.6, 14, "#ffb347", 3.2, Math.PI, 0);
+  panel(12, 3.2, 0, 2.6, -14, "#9fb4c8", 0.9, 0, 0);
+  panel(6, 4, -16, 3, 0, "#ffffff", 0.7, Math.PI / 2, 0);
+  panel(6, 4, 16, 3, 0, "#ffb347", 1.2, -Math.PI / 2, 0);
+  const pm = new THREE.PMREMGenerator(renderer);
+  const t = pm.fromScene(env, 0.02).texture; pm.dispose(); return t;
+}
+scene.environment = studioEnv();
+scene.environmentIntensity = 1.5;
+
+function radial(stops, size = 512) {
+  const c = document.createElement("canvas"); c.width = c.height = size;
+  const g = c.getContext("2d"); const gr = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  stops.forEach(([o, col]) => gr.addColorStop(o, col)); g.fillStyle = gr; g.fillRect(0, 0, size, size);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+if (!small()) {
+  const mirror = new Reflector(new THREE.CircleGeometry(30, 96), { color: 0x6a6a6a, textureWidth: 1024, textureHeight: 1024, clipBias: 0.003 });
+  mirror.rotation.x = -Math.PI / 2; scene.add(mirror);
+}
+const veil = new THREE.Mesh(new THREE.CircleGeometry(30, 96), new THREE.MeshBasicMaterial({
+  map: small() ? radial([[0, "rgba(24,22,20,1)"], [0.4, "rgba(14,14,15,1)"], [1, "rgba(11,12,13,1)"]])
+               : radial([[0, "rgba(11,12,13,0.78)"], [0.16, "rgba(11,12,13,0.87)"], [0.4, "rgba(11,12,13,1)"], [1, "rgba(11,12,13,1)"]]),
+  transparent: true, depthWrite: false, toneMapped: false }));
+veil.rotation.x = -Math.PI / 2; veil.position.y = 0.002; scene.add(veil);
+const pool = new THREE.Mesh(new THREE.PlaneGeometry(14, 9), new THREE.MeshBasicMaterial({
+  map: radial([[0, "rgba(255,214,160,0.13)"], [0.5, "rgba(255,214,160,0.04)"], [1, "rgba(255,214,160,0)"]]),
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+pool.rotation.x = -Math.PI / 2; pool.position.y = 0.004; scene.add(pool);
+
+const camera = new THREE.PerspectiveCamera(27, 1, 0.05, 120);
+// framing that matches the poster renders: [distance, height, azimuth, look, fov, view shift]
+const FRAME = {
+  wide: { pos: new THREE.Vector3(-5.0, 0.62, 3.35), look: new THREE.Vector3(0.15, 0.5, 0), fov: 27, shift: [-0.13, 0.03] },
+  tall: { pos: new THREE.Vector3(-5.9, 0.95, 4.4), look: new THREE.Vector3(-0.1, 0.45, 0), fov: 34, shift: [0, 0.12] },
+};
+let F = FRAME.wide, baseR = 0, baseAz = 0;
+function resize() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h, false);
+  F = small() ? FRAME.tall : FRAME.wide;
+  const d = F.pos.clone().sub(F.look);
+  baseR = Math.hypot(d.x, d.z); baseAz = Math.atan2(d.z, d.x);
+  camera.fov = F.fov; camera.aspect = w / h;
+  camera.setViewOffset(w, h, F.shift[0] * w, F.shift[1] * h, w, h);
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize);
+
+const paint = new THREE.MeshPhysicalMaterial({ color: "#2b2e31", metalness: 0.75, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.03 });
+const alloy = new THREE.MeshPhysicalMaterial({ color: "#0a0a0a", metalness: 0.9, roughness: 0.2, clearcoat: 0.6 });
+const caliper = new THREE.MeshStandardMaterial({ color: "#f2a400", metalness: 0.25, roughness: 0.35 });
+const lamps = [];
+
+const draco = new DRACOLoader();
+draco.setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/");
+const loader = new GLTFLoader(); loader.setDRACOLoader(draco);
+
+let ready = false, visible = true, shownAt = 0;
+loader.load("/car.glb", (gltf) => {
+  const m = gltf.scene; const S = 0.176;
+  m.scale.setScalar(S); m.position.x = 0.6 * S;
+  m.traverse((o) => {
+    if (!o.isMesh) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    const out = mats.map((mt) => {
+      switch (mt.name) {
+        case "Mt_Body": case "Mt_MirrorCover": return paint;
+        case "Mt_AlloyWheels": return alloy;
+        case "Mt_BrakeCaliper": return caliper;
+        case "Mt_Shadow_Plane": return new THREE.MeshBasicMaterial({ color: 0xffffff, map: mt.map, transparent: true, depthWrite: false });
+        case "Mt_Light_Emissive": mt.emissive = new THREE.Color(0xffffff); mt.emissiveIntensity = 2.8; lamps.push(mt); return mt;
+        case "Mt_AventadorAtlas": mt.visible = false; return mt;
+        case "Mt_Chrome": case "Mt_Mirror": mt.roughness = 0.05; return mt;
+        case "Mt_WindScreens": mt.roughness = 0; mt.metalness = 0.2; mt.color.set(0x000000); mt.opacity = 0.6; return mt;
+        default: return mt;
+      }
+    });
+    o.material = Array.isArray(o.material) ? out : out[0];
+    if (o.name === "Obj_Shadow_Plane") o.renderOrder = 1;
+  });
+  m.traverse((o) => {
+    if (/^Obj_(Rim_T0A|Tyre|DiscRotor|WheelHub|Caliper)_F[LR]$/.test(o.name))
+      o.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.3));
+  });
+  scene.add(m);
+  resize();
+  renderer.render(scene, camera);
+  ready = true; shownAt = performance.now();
+  requestAnimationFrame(() => { canvas.classList.add("on"); document.getElementById("badge3d")?.classList.add("on"); });
+}, undefined, () => {}); // on failure the poster image simply stays
+
+// pointer and scroll drive the camera a little; a slow drift keeps it alive
+let px = 0, py = 0, tx = 0, ty = 0;
+addEventListener("pointermove", (e) => { tx = e.clientX / innerWidth - 0.5; ty = e.clientY / innerHeight - 0.5; }, { passive: true });
+if ("IntersectionObserver" in window) new IntersectionObserver((es) => { visible = es[0].isIntersecting; }).observe(hero);
+
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  if (!ready || !visible || document.hidden) return;
+  const t = clock.getElapsedTime();
+  px += (tx - px) * 0.04; py += (ty - py) * 0.04;
+  const scroll = Math.min(scrollY / innerHeight, 1);
+  const intro = Math.min((performance.now() - shownAt) / 2600, 1);
+  const ease = intro * intro * (3 - 2 * intro);
+  const az = baseAz + Math.sin(t * 0.18) * 0.1 * ease - px * 0.22 - scroll * 0.55;
+  const r = baseR * (small() ? 1 : 1.08) * (1 - 0.03 * ease) * (1 + scroll * 0.08);
+  camera.position.set(F.look.x + Math.cos(az) * r, F.pos.y + py * -0.18 + scroll * 0.5, F.look.z + Math.sin(az) * r);
+  camera.lookAt(F.look);
+  for (const l of lamps) l.emissiveIntensity = 2.6 + Math.sin(t * 1.4) * 0.25;
+  renderer.render(scene, camera);
+});
+}
 </script>
 </body>
 </html>
