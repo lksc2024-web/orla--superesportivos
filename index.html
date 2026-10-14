@@ -95,6 +95,14 @@ p { margin: 0; }
 .hero-badge3d { position: absolute; z-index: 4; right: var(--gutter-r); top: 96px; font: 500 10px/1 var(--f-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; opacity: 0; transition: opacity .8s; }
 .hero-badge3d i { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
 .hero-badge3d.on { opacity: 1; }
+.pause3d { margin-left: 6px; display: inline-flex; align-items: center; gap: 6px; font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--fg); background: rgba(236, 235, 230, .06); border: 1px solid var(--line); padding: 6px 9px; cursor: pointer; pointer-events: auto; }
+.pause3d svg { width: 9px; height: 9px; }
+.pause3d[aria-pressed="true"] { color: var(--amber); border-color: var(--amber); }
+.hero-badge3d:not(.on) .pause3d { visibility: hidden; }
+.diag3d { position: absolute; z-index: 6; left: var(--gutter); top: 84px; font: 500 11px/1.4 var(--f-mono); color: var(--amber); background: rgba(0, 0, 0, .7); padding: 6px 8px; }
+/* when the 3D cannot run, the poster keeps a slow camera move instead of standing still */
+.hero.no3d .hero-media img { animation: drift 18s ease-in-out infinite alternate; }
+@keyframes drift { 0% { transform: scale(1.04) translate3d(0, 0, 0); } 100% { transform: scale(1.14) translate3d(-2.5%, -1%, 0); } }
 @media (max-width: 760px) { .hero-badge3d { top: 80px; } }
 
 /* facts strip */
@@ -279,7 +287,10 @@ p { margin: 0; }
       <div class="rating" aria-label="Nota 5,0 de 5 no Google, 9 avaliações"><span class="stars" aria-hidden="true">★★★★★</span><b>5,0</b> no Google · 9 avaliações</div>
     </div>
     <div class="scroll-cue" aria-hidden="true">Role</div>
-    <div class="hero-badge3d" id="badge3d" aria-hidden="true"><i></i>Ilustração 3D em tempo real</div>
+    <div class="hero-badge3d" id="badge3d"><i aria-hidden="true"></i><span>Ilustração 3D em tempo real</span>
+      <button class="pause3d" id="pause3d" type="button" aria-pressed="false" aria-label="Pausar ou continuar a animação 3D"><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="2.6" height="9" fill="currentColor"/><rect x="7.4" y="1.5" width="2.6" height="9" fill="currentColor"/></svg><span>Pausar</span></button>
+    </div>
+    <div class="diag3d" id="diag3d" hidden></div>
   </section>
 
   <section class="facts" aria-label="Informações rápidas">
@@ -562,6 +573,7 @@ p { margin: 0; }
   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
 } }
 </script>
+<script>if (location.hash === "#diag") document.addEventListener("DOMContentLoaded", () => { const d = document.getElementById("diag3d"); if (d) d.hidden = false; });</script>
 <script type="module">
 // Live 3D hero: the car turns on a showroom turntable and opens its scissor doors in a loop.
 // The rendered poster image stays underneath until the first 3D frame is ready.
@@ -573,7 +585,15 @@ import { Reflector } from "three/addons/objects/Reflector.js";
 const canvas = document.getElementById("hero3d");
 const hero = document.getElementById("inicio");
 const small = () => innerWidth <= 760;
-if (canvas && !matchMedia("(prefers-reduced-motion: reduce)").matches) { try { start(); } catch (e) { /* the poster image stays */ } }
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const status = (v) => { hero.dataset.three = v; const d = document.getElementById("diag3d"); if (d) d.textContent = "3D: " + v + (calm ? " · sistema pede menos movimento" : ""); };
+function noThree(why) { status(why); hero.classList.add("no3d"); }
+if (canvas) {
+  const probe = document.createElement("canvas");
+  const ok = !!(probe.getContext("webgl2") || probe.getContext("webgl"));
+  if (!ok) noThree("sem WebGL (aceleração de hardware desligada?)");
+  else { status("carregando"); try { start(); } catch (e) { noThree("erro ao iniciar: " + (e && e.message || e)); } }
+}
 
 // Splits the "Obj_Side_Doors" node into a left and a right door hung on hinges.
 // Everything is baked into the car root's own space (x = length, y = up, z = width),
@@ -639,6 +659,7 @@ function makeDoors(THREE, root) {
 
 function start() {
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); noThree("contexto 3D perdido"); canvas.classList.remove("on"); });
 renderer.setPixelRatio(Math.min(devicePixelRatio, small() ? 1.25 : 1.5));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.35;
@@ -762,9 +783,9 @@ loader.load("/car.glb", (gltf) => {
   try { doors = makeDoors(THREE, m); } catch (e) { doors = null; }
   resize();
   renderer.render(scene, camera);
-  ready = true; shownAt = performance.now();
+  ready = true; shownAt = performance.now(); status("ativo");
   requestAnimationFrame(() => { canvas.classList.add("on"); document.getElementById("badge3d")?.classList.add("on"); });
-}, undefined, () => {}); // on failure the poster image simply stays
+}, undefined, (e) => noThree("modelo não carregou")); // poster stays, with the fallback camera move
 
 let px = 0, py = 0, tx = 0, ty = 0;
 addEventListener("pointermove", (e) => { tx = e.clientX / innerWidth - 0.5; ty = e.clientY / innerHeight - 0.5; }, { passive: true });
@@ -781,14 +802,18 @@ function doorState(t) {
   if (k < 10.6) return 1 - (k - 9) / 1.6;
   return 0;
 }
-let angle = 0, last = performance.now();
+let angle = 0, last = performance.now(), paused = false, tPaused = 0;
+const pauseBtn = document.getElementById("pause3d");
+if (pauseBtn) pauseBtn.addEventListener("click", () => { paused = !paused; pauseBtn.setAttribute("aria-pressed", String(paused)); pauseBtn.querySelector("span").textContent = paused ? "Continuar" : "Pausar"; });
 renderer.setAnimationLoop(() => {
   const now = performance.now();
   const dt = Math.min((now - last) / 1000, 0.05); last = now;
   if (!ready || !visible || document.hidden) return;
-  const t = (now - shownAt) / 1000;
+  if (paused) { tPaused += dt; return; }
+  const t = (now - shownAt) / 1000 - tPaused;
   const ramp = Math.min(t / 2.5, 1);
-  angle += SPIN * dt * ramp * ramp;
+  if (paused) return;
+  angle += SPIN * (calm ? 0.5 : 1) * dt * ramp * ramp;
   stage.rotation.y = angle;
   if (doors) doors.set(doorState(t - 0.5));
   px += (tx - px) * 0.05; py += (ty - py) * 0.05;
