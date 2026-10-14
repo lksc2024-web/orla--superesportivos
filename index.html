@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orla Superesportivos</title>
+<meta name="description" content="Projeto demonstrativo: loja de superesportivos com um Aventador em 3D, configurador ao vivo e agendamento de test drive.">
+<meta property="og:title" content="Orla Superesportivos">
+<meta property="og:description" content="Projeto demonstrativo de site para loja de superesportivos com carro em 3D.">
+<meta name="theme-color" content="#0c0d0e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230c0d0e'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='700' font-size='16' fill='%23eceae5' text-anchor='middle'%3EO%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wdth,wght@50..125,300..800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a dark photo-studio showroom fills the screen; five scroll chapters slide copy over it while the camera walks around the car. The UI stays monochrome so the only color on screen is the paint. */
+:root {
+  --night: #0c0d0e;       /* studio black, matches the 3D background */
+  --glass: rgba(18, 19, 21, 0.78);
+  --fg: #eceae5;
+  --muted: #94958f;
+  --line: rgba(236, 234, 229, 0.14);
+  --ok: #7fc59a;
+  --hold: #d9b45a;
+  --f-display: "Saira", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { background: var(--night); color: var(--fg); }
+body { margin: 0; font-family: var(--f-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+
+#stage { position: fixed; inset: 0; z-index: 0; display: block; width: 100vw; height: 100vh; height: 100dvh; }
+#loader {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; pointer-events: none;
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  display: flex; justify-content: center; align-items: center; gap: 14px;
+  font: 400 11px/1 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+  transition: opacity .8s;
+}
+#loader .bar { width: 160px; height: 1px; background: var(--line); position: relative; overflow: hidden; }
+#loader .bar i { position: absolute; inset: 0; background: var(--fg); transform-origin: left; transform: scaleX(0); }
+#loader.done { opacity: 0; }
+
+header.top {
+  position: fixed; z-index: 2; top: 0; left: 0; right: 0;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 18px max(16px, env(safe-area-inset-left, 0px));
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: linear-gradient(var(--night), rgba(12, 13, 14, 0));
+}
+.brand { font: 700 15px/1 var(--f-display); font-variation-settings: "wdth" 125; letter-spacing: .32em; text-transform: uppercase; color: var(--fg); text-decoration: none; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: .2em; margin-left: 10px; }
+.demo-tag { font: 400 10px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); padding: 6px 8px; margin-right: auto; }
+.top nav { display: flex; gap: 22px; font: 500 13px/1 var(--f-body); }
+.top nav a { color: var(--muted); text-decoration: none; transition: color .2s; }
+.top nav a:hover, .top nav a.on { color: var(--fg); }
+
+main { position: relative; z-index: 1; }
+.chapter {
+  min-height: 100vh; min-height: 100svh;
+  display: flex; align-items: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 110px 64px;
+  pointer-events: none;
+}
+.wrap { width: 100%; max-width: 1280px; margin-inline: auto; }
+.panel { pointer-events: auto; width: min(460px, 100%); }
+.sheet { background: var(--glass); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid var(--line); padding: 28px 28px 24px; }
+
+.hero { align-items: flex-end; padding-block: 110px 56px; }
+.hero .panel { width: min(640px, 100%); }
+.eyebrow { font: 400 11px/1.4 var(--f-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+h1, h2 { font-family: var(--f-display); font-weight: 600; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.6rem, 7vw, 5.6rem); line-height: .92; font-variation-settings: "wdth" 72; letter-spacing: -0.01em; margin-top: 14px; text-transform: uppercase; }
+h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1; font-variation-settings: "wdth" 80; text-transform: uppercase; margin-top: 12px; }
+.figures { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 22px 0 0; padding: 0; list-style: none; }
+.figures li { display: grid; gap: 4px; }
+.figures b { font: 600 1.5rem/1 var(--f-display); font-variation-settings: "wdth" 85; font-variant-numeric: tabular-nums; }
+.figures span { font: 400 10.5px/1.3 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.lede { margin: 14px 0 0; color: var(--muted); max-width: 46ch; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.btn { font: 600 14px/1 var(--f-body); letter-spacing: .02em; border: 0; cursor: pointer; text-decoration: none; padding: 15px 24px; display: inline-flex; align-items: center; transition: background-color .2s, color .2s; }
+.btn-main { background: var(--fg); color: var(--night); }
+.btn-main:hover { background: #fff; }
+.btn-line { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px rgba(236, 234, 229, .45); }
+.btn-line:hover { background: rgba(236, 234, 229, .1); }
+.btn:focus-visible, .chip:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+
+.ledger { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: .95rem; }
+.ledger th { text-align: left; font: 400 10.5px/1.3 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 0 0 10px; border-bottom: 1px solid var(--line); }
+.ledger td { padding: 12px 10px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ledger td:last-child, .ledger th:last-child { padding-right: 0; text-align: right; }
+.ledger .model { font-weight: 600; }
+.ledger .sub { display: block; color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
+.status { font: 500 11px/1.4 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.status::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; background: currentColor; }
+.s-ok { color: var(--ok); } .s-hold { color: var(--hold); } .s-shop { color: var(--muted); }
+.note { margin: 14px 0 0; font: 400 11.5px/1.5 var(--f-mono); color: var(--muted); }
+
+.opt { margin-top: 20px; }
+.opt-head { display: flex; justify-content: space-between; gap: 12px; font: 400 10.5px/1.3 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.opt-head output { color: var(--fg); }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.chip { width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; background: var(--c); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), inset 0 -10px 14px rgba(0,0,0,.35), inset 0 8px 10px rgba(255,255,255,.18); transition: transform .2s; }
+.chip[aria-pressed="true"] { transform: scale(1.1); box-shadow: 0 0 0 2px var(--night), 0 0 0 4px var(--fg), inset 0 -10px 14px rgba(0,0,0,.35); }
+
+.services { list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.services li { padding: 13px 0; border-bottom: 1px solid var(--line); display: grid; gap: 3px; }
+.services strong { font-weight: 600; }
+.services span { color: var(--muted); font-size: .94rem; }
+
+form { display: grid; gap: 14px; margin-top: 18px; }
+.field { display: grid; gap: 6px; }
+.field label { font: 400 10.5px/1.3 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.field input, .field select { font: 400 15px/1.3 var(--f-body); color: var(--fg); background: rgba(236,234,229,.05); border: 1px solid var(--line); border-radius: 0; padding: 12px 12px; width: 100%; min-width: 0; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.row2 > * { min-width: 0; }
+.done-msg { margin: 4px 0 0; color: var(--fg); }
+.done-msg small { display: block; color: var(--muted); margin-top: 4px; font-size: .85rem; }
+
+.rail { position: fixed; z-index: 2; right: max(22px, calc(env(safe-area-inset-right, 0px) + 12px)); top: 50%; transform: translateY(-50%); display: grid; gap: 12px; list-style: none; margin: 0; padding: 0; }
+.rail a { display: block; width: 26px; height: 2px; background: var(--line); transition: background-color .3s, width .3s; }
+.rail a.on { background: var(--fg); width: 40px; }
+
+footer.credit { position: relative; z-index: 1; padding: 0 max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+footer.credit p { max-width: 1280px; margin: 0 auto; font: 400 11px/1.6 var(--f-mono); color: var(--muted); }
+footer.credit a { color: inherit; }
+
+@media (max-width: 860px) {
+  .top nav { display: none; }
+  .rail { display: none; }
+  .chapter { align-items: flex-end; padding-block: 50vh 24px; }
+  .hero { padding-block: 56vh 24px; }
+  .sheet { padding: 20px 18px 18px; }
+  .ledger .hide-sm { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .btn, .chip, .rail a { transition: none; } }
+</style>
+
+</head>
+<body>
+<canvas id="stage" aria-label="Lamborghini Aventador em 3D num estúdio escuro"></canvas>
+<div id="loader" role="status"><span id="loadtxt">Acendendo o estúdio</span><span class="bar"><i id="loadbar"></i></span></div>
+
+<header class="top">
+  <a class="brand" href="#inicio">Orla<span>Superesportivos</span></a>
+  <span class="demo-tag">Projeto demonstrativo</span>
+  <nav aria-label="Seções">
+    <a href="#estoque" data-i="1">Estoque</a>
+    <a href="#configurar" data-i="2">Configurar</a>
+    <a href="#oficina" data-i="3">Oficina</a>
+    <a href="#contato" data-i="4">Test drive</a>
+  </nav>
+</header>
+<ol class="rail" aria-hidden="true">
+  <li><a href="#inicio" tabindex="-1" class="on"></a></li>
+  <li><a href="#estoque" tabindex="-1"></a></li>
+  <li><a href="#configurar" tabindex="-1"></a></li>
+  <li><a href="#oficina" tabindex="-1"></a></li>
+  <li><a href="#contato" tabindex="-1"></a></li>
+</ol>
+
+<main>
+  <section class="chapter hero" id="inicio">
+    <div class="wrap"><div class="panel">
+      <div class="eyebrow">Em destaque · Rio de Janeiro</div>
+      <h1>Aventador LP 700-4</h1>
+      <ul class="figures">
+        <li><b>V12 6.5</b><span>Aspirado</span></li>
+        <li><b>700 cv</b><span>Potência</span></li>
+        <li><b>2,9 s</b><span>0 a 100 km/h</span></li>
+        <li><b>350 km/h</b><span>Velocidade máx.</span></li>
+      </ul>
+      <div class="actions">
+        <a class="btn btn-main" href="#contato">Agendar test drive</a>
+        <a class="btn btn-line" href="#configurar">Configurar</a>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="chapter" id="estoque">
+    <div class="wrap"><div class="panel sheet">
+      <div class="eyebrow">Estoque</div>
+      <h2>Na loja agora</h2>
+      <table class="ledger">
+        <thead><tr><th>Modelo</th><th class="hide-sm">Cor</th><th>Situação</th></tr></thead>
+        <tbody>
+          <tr><td><span class="model">Aventador LP 700-4</span><span class="sub">2013 · 21.300 km</span></td><td class="hide-sm">Rosso Mars</td><td><span class="status s-ok">Disponível</span></td></tr>
+          <tr><td><span class="model">Huracán EVO</span><span class="sub">2021 · 9.800 km</span></td><td class="hide-sm">Bianco Monocerus</td><td><span class="status s-ok">Disponível</span></td></tr>
+          <tr><td><span class="model">Urus S</span><span class="sub">2023 · 4.100 km</span></td><td class="hide-sm">Nero Noctis</td><td><span class="status s-hold">Reservado</span></td></tr>
+          <tr><td><span class="model">Gallardo LP 560-4 Spyder</span><span class="sub">2010 · 33.700 km</span></td><td class="hide-sm">Bianco</td><td><span class="status s-shop">Na oficina</span></td></tr>
+        </tbody>
+      </table>
+      <p class="note">Estoque de exemplo. Preços sob consulta.</p>
+    </div></div>
+  </section>
+
+  <section class="chapter" id="configurar">
+    <div class="wrap"><div class="panel sheet">
+      <div class="eyebrow">Configurar</div>
+      <h2>Monte o seu</h2>
+      <div class="opt">
+        <div class="opt-head"><span>Pintura</span><output id="out-paint">Rosso Mars</output></div>
+        <div class="chips" role="group" aria-label="Pintura">
+          <button class="chip" id="p-rosso" type="button" style="--c:#bf0012" data-k="paint" data-v="#bf0012" data-n="Rosso Mars" aria-pressed="true" aria-label="Rosso Mars"></button>
+          <button class="chip" id="p-arancio" type="button" style="--c:#f77f21" data-k="paint" data-v="#f77f21" data-n="Arancio Atlas" aria-pressed="false" aria-label="Arancio Atlas"></button>
+          <button class="chip" id="p-blu" type="button" style="--c:#4393e6" data-k="paint" data-v="#3f86d6" data-n="Blu Cepheus" aria-pressed="false" aria-label="Blu Cepheus"></button>
+          <button class="chip" id="p-bianco" type="button" style="--c:#f2f3f5" data-k="paint" data-v="#eceef0" data-n="Bianco Monocerus" aria-pressed="false" aria-label="Bianco Monocerus"></button>
+          <button class="chip" id="p-nero" type="button" style="--c:#141517" data-k="paint" data-v="#101113" data-n="Nero Aldebaran" aria-pressed="false" aria-label="Nero Aldebaran"></button>
+        </div>
+      </div>
+      <div class="opt">
+        <div class="opt-head"><span>Rodas</span><output id="out-wheel">Nero lucido</output></div>
+        <div class="chips" role="group" aria-label="Rodas">
+          <button class="chip" id="w-nero" type="button" style="--c:#0d0d0d" data-k="wheel" data-v="#050505" data-n="Nero lucido" aria-pressed="true" aria-label="Nero lucido"></button>
+          <button class="chip" id="w-titanio" type="button" style="--c:#5b5d60" data-k="wheel" data-v="#4d4f52" data-n="Titanio" aria-pressed="false" aria-label="Titanio"></button>
+          <button class="chip" id="w-argento" type="button" style="--c:#b9bbbe" data-k="wheel" data-v="#a9abae" data-n="Argento" aria-pressed="false" aria-label="Argento"></button>
+        </div>
+      </div>
+      <div class="opt">
+        <div class="opt-head"><span>Pinças de freio</span><output id="out-caliper">Giallo</output></div>
+        <div class="chips" role="group" aria-label="Pinças de freio">
+          <button class="chip" id="c-giallo" type="button" style="--c:#f2c200" data-k="caliper" data-v="#f2c200" data-n="Giallo" aria-pressed="true" aria-label="Giallo"></button>
+          <button class="chip" id="c-rosso" type="button" style="--c:#c4141c" data-k="caliper" data-v="#c4141c" data-n="Rosso" aria-pressed="false" aria-label="Rosso"></button>
+          <button class="chip" id="c-nero" type="button" style="--c:#151515" data-k="caliper" data-v="#151515" data-n="Nero" aria-pressed="false" aria-label="Nero"></button>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="chapter" id="oficina">
+    <div class="wrap"><div class="panel sheet">
+      <div class="eyebrow">Oficina</div>
+      <h2>Manutenção sem sair da loja</h2>
+      <ul class="services">
+        <li><strong>Revisões no plano do fabricante</strong><span>Com leitura de falhas por scanner e relatório do que foi trocado.</span></li>
+        <li><strong>Câmbio ISR e embreagem</strong><span>Diagnóstico, calibração e troca do conjunto.</span></li>
+        <li><strong>Freios de carbono-cerâmica</strong><span>Medição de desgaste dos discos e troca de pastilhas.</span></li>
+        <li><strong>PPF e envelopamento</strong><span>Película de proteção de pintura aplicada em cabine fechada.</span></li>
+      </ul>
+    </div></div>
+  </section>
+
+  <section class="chapter" id="contato">
+    <div class="wrap"><div class="panel sheet">
+      <div class="eyebrow">Test drive</div>
+      <h2>Agende uma visita</h2>
+      <form id="visit" novalidate>
+        <div class="field"><label for="f-name">Nome</label><input id="f-name" name="name" autocomplete="name" required></div>
+        <div class="row2">
+          <div class="field"><label for="f-phone">WhatsApp</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required></div>
+          <div class="field"><label for="f-date">Dia</label><input id="f-date" name="date" type="date" required></div>
+        </div>
+        <div class="field"><label for="f-car">Carro</label>
+          <select id="f-car" name="car">
+            <option>Aventador LP 700-4</option><option>Huracán EVO</option><option>Urus S</option><option>Gallardo LP 560-4 Spyder</option>
+          </select>
+        </div>
+        <div class="actions" style="margin-top:6px"><button class="btn btn-main" type="submit">Pedir horário</button></div>
+        <p class="done-msg" id="done" hidden></p>
+      </form>
+    </div></div>
+  </section>
+</main>
+
+<footer class="credit">
+  <p>Loja, estoque e dados de contato fictícios, criados para demonstração. Modelo 3D do Aventador: projeto <a href="https://github.com/codeagencybe/automotive-configurator" target="_blank" rel="noopener">automotive-configurator</a> (GitHub), modelo original de tf3dm.com, com emblemas removidos. Lamborghini e Aventador são marcas da Automobili Lamborghini S.p.A.; esta página não tem ligação com a marca.</p>
+</footer>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { Reflector } from "three/addons/objects/Reflector.js";
+
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const small = () => innerWidth <= 860;
+const canvas = document.getElementById("stage");
+const loaderEl = document.getElementById("loader");
+const loadbar = document.getElementById("loadbar");
+const loadtxt = document.getElementById("loadtxt");
+const NIGHT = new THREE.Color("#0c0d0e");
+
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+} catch (e) {
+  loadtxt.textContent = "Seu navegador não abriu o 3D. O resto da página funciona normalmente.";
+  throw e;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, small() ? 1.5 : 1.75));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+
+const scene = new THREE.Scene();
+scene.background = NIGHT;
+scene.environmentIntensity = 0;
+
+// --- photo-studio environment: dark room, long overhead strips and two side softboxes
+function studioEnv() {
+  const env = new THREE.Scene();
+  const room = new THREE.Mesh(new THREE.BoxGeometry(40, 16, 40), new THREE.MeshBasicMaterial({ color: 0x0b0b0c, side: THREE.BackSide }));
+  room.position.y = 7;
+  env.add(room);
+  const strip = (w, d, x, y, z, k, ry = 0, rx = Math.PI / 2) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ color: new THREE.Color(1, 1, 1).multiplyScalar(k), side: THREE.DoubleSide }));
+    m.position.set(x, y, z); m.rotation.set(rx, ry, 0); env.add(m);
+  };
+  strip(16, 0.5, 0, 7, -1.6, 9);
+  strip(16, 0.5, 0, 7, 0, 11);
+  strip(16, 0.5, 0, 7, 1.6, 9);
+  strip(10, 5, 0, 3.2, -14, 1.6, 0, 0);
+  strip(10, 5, 0, 3.2, 14, 1.6, Math.PI, 0);
+  strip(6, 4, -16, 3, 0, 1.0, Math.PI / 2, 0);
+  strip(6, 4, 16, 3, 0, 0.8, -Math.PI / 2, 0);
+  const pm = new THREE.PMREMGenerator(renderer);
+  const tex = pm.fromScene(env, 0.02).texture;
+  pm.dispose();
+  return tex;
+}
+scene.environment = studioEnv();
+
+// --- floor: mirror reflection dimmed by a glossy black layer that fades into the dark
+let mirror = null;
+if (!small()) {
+  mirror = new Reflector(new THREE.CircleGeometry(30, 96), { color: 0x777777, textureWidth: 1024, textureHeight: 1024, clipBias: 0.003 });
+  mirror.rotation.x = -Math.PI / 2;
+  scene.add(mirror);
+}
+function radial(stops, size = 512) {
+  const c = document.createElement("canvas"); c.width = c.height = size;
+  const g = c.getContext("2d");
+  const gr = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  stops.forEach(([o, col]) => gr.addColorStop(o, col));
+  g.fillStyle = gr; g.fillRect(0, 0, size, size);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const veil = new THREE.Mesh(new THREE.CircleGeometry(30, 96), new THREE.MeshBasicMaterial({
+  map: radial([[0, "rgba(12,13,14,0.80)"], [0.18, "rgba(12,13,14,0.88)"], [0.42, "rgba(12,13,14,1)"], [1, "rgba(12,13,14,1)"]]),
+  transparent: true, depthWrite: false, toneMapped: false }));
+veil.rotation.x = -Math.PI / 2; veil.position.y = 0.002;
+scene.add(veil);
+if (!mirror) veil.material.map = radial([[0, "rgba(28,29,31,1)"], [0.5, "rgba(16,17,18,1)"], [1, "rgba(12,13,14,1)"]]);
+const poolMat = new THREE.MeshBasicMaterial({ map: radial([[0, "rgba(255,255,255,0.16)"], [0.5, "rgba(255,255,255,0.05)"], [1, "rgba(255,255,255,0)"]]), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0, toneMapped: false });
+const pool = new THREE.Mesh(new THREE.PlaneGeometry(14, 9), poolMat);
+pool.rotation.x = -Math.PI / 2; pool.position.y = 0.004;
+scene.add(pool);
+
+// --- car
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 120);
+const car = new THREE.Group();
+scene.add(car);
+const paint = new THREE.MeshPhysicalMaterial({ color: "#bf0012", metalness: 0.55, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.03 });
+const alloy = new THREE.MeshPhysicalMaterial({ color: "#050505", metalness: 0.9, roughness: 0.18, clearcoat: 0.6 });
+const caliper = new THREE.MeshStandardMaterial({ color: "#f2c200", metalness: 0.2, roughness: 0.35 });
+const goal = { paint: new THREE.Color("#bf0012"), wheel: new THREE.Color("#050505"), caliper: new THREE.Color("#f2c200") };
+let lamps = [];
+const spinners = []; // { o, q0, front }
+const steerers = [];
+let ready = false, litAt = 0;
+
+const draco = new DRACOLoader();
+draco.setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/");
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(draco);
+
+function onCar(gltf) {
+  const m = gltf.scene;
+  const S = 0.176;
+  m.scale.setScalar(S);
+  m.position.x = 0.6 * S;
+  m.traverse((o) => {
+    if (!o.isMesh) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    const out = mats.map((mt) => {
+      switch (mt.name) {
+        case "Mt_Body": case "Mt_MirrorCover": return paint;
+        case "Mt_AlloyWheels": return alloy;
+        case "Mt_BrakeCaliper": return caliper;
+        case "Mt_Shadow_Plane": { const b = new THREE.MeshBasicMaterial({ color: 0xffffff, map: mt.map, transparent: true, depthWrite: false }); return b; }
+        case "Mt_Light_Emissive": { mt.emissive = new THREE.Color(0xffffff); mt.emissiveIntensity = 0; lamps.push(mt); return mt; }
+        case "Mt_Chrome": case "Mt_Mirror": mt.roughness = 0.05; return mt;
+        case "Mt_WindScreens": mt.roughness = 0; mt.metalness = 0.2; mt.color.set(0x000000); mt.opacity = 0.55; return mt;
+        default: return mt;
+      }
+    });
+    o.material = Array.isArray(o.material) ? out : out[0];
+    if (o.name === "Obj_Shadow_Plane") o.renderOrder = 1;
+  });
+  m.traverse((o) => {
+    const n = o.name;
+    const front = /_F[LR]$/.test(n);
+    if (/^Obj_(Rim_T0A|Tyre|DiscRotor|WheelHub)_/.test(n)) spinners.push({ o, q0: o.quaternion.clone(), front });
+    else if (/^Obj_Caliper_F/.test(n)) steerers.push({ o, q0: o.quaternion.clone() });
+  });
+  car.add(m);
+  ready = true;
+  litAt = performance.now();
+  loaderEl.classList.add("done");
+}
+// car.glb is the compressed model (2 MB) with badges removed; the original file on GitHub is the fallback
+const SOURCES = [
+  { url: "./car.glb", size: 2169900 },
+  { url: "https://raw.githubusercontent.com/codeagencybe/automotive-configurator/main/src/static/assets/aventador/model.glb", size: 13040168 }
+];
+function loadCar(i) {
+  if (i >= SOURCES.length) { loadtxt.textContent = "Não consegui carregar o modelo 3D. Recarregue a página."; return; }
+  gltfLoader.load(SOURCES[i].url, (gltf) => {
+    const hide = [];
+    gltf.scene.traverse((o) => { if (/^Obj_(Badge_Hood|Emblem_Rear|Interior_Steering_Emblem)$/.test(o.name) || /^Obj_Rim_T0B/.test(o.name)) hide.push(o); });
+    hide.forEach((o) => o.parent && o.parent.remove(o));
+    onCar(gltf);
+  }, (e) => {
+    const total = e.total || SOURCES[i].size;
+    loadbar.style.transform = `scaleX(${Math.min(e.loaded / total, 1)})`;
+  }, () => loadCar(i + 1));
+}
+loadCar(0);
+
+// --- camera path, one keyframe per chapter. Car front faces -x; th is measured from +x toward +z.
+const keys = [
+  { th: 150, h: 0.95, r: 7.4, ty: 0.48, steer: -0.32, m: 0.9 },
+  { th: 90, h: 0.85, r: 8.6, ty: 0.55, steer: 0, m: 1.12 },
+  { th: 35, h: 1.35, r: 7.2, ty: 0.48, steer: 0, m: 1.0 },
+  { th: -55, h: 2.3, r: 7.8, ty: 0.42, steer: 0.28, m: 0.95 },
+  { th: -150, h: 4.6, r: 9.0, ty: 0.15, steer: 0.28, m: 1.0 },
+];
+const smoother = (x) => x * x * x * (x * (x * 6 - 15) + 10);
+function pose(p) {
+  const s = Math.min(Math.max(p, 0), 1) * (keys.length - 1);
+  const i = Math.min(Math.floor(s), keys.length - 2);
+  const f = smoother(s - i);
+  const a = keys[i], b = keys[i + 1];
+  const o = {};
+  for (const k in a) o[k] = a[k] + (b[k] - a[k]) * f;
+  return o;
+}
+
+let target = 0, cur = 0, rScale = 1, pushIn = 1;
+function readScroll() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  target = max > 0 ? Math.min(scrollY / max, 1) : 0;
+  const idx = Math.round(target * (keys.length - 1));
+  document.querySelectorAll(".rail a").forEach((a, i) => a.classList.toggle("on", i === idx));
+  document.querySelectorAll(".top nav a").forEach((a) => a.classList.toggle("on", +a.dataset.i === idx));
+}
+addEventListener("scroll", readScroll, { passive: true });
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  if (w > 860) { camera.fov = 30; rScale = 1; camera.setViewOffset(w, h, -w * 0.14, 0, w, h); }
+  else { camera.fov = 36; rScale = Math.max(1, 0.9 / camera.aspect); camera.setViewOffset(w, h, 0, h * 0.21, w, h); }
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize", resize);
+resize(); readScroll(); cur = target;
+
+// --- loop
+const qa = new THREE.Quaternion(), qs = new THREE.Quaternion();
+const AX_Z = new THREE.Vector3(0, 0, 1), AX_Y = new THREE.Vector3(0, 1, 0);
+const stripsOn = [0.35, 0.8, 1.2]; // seconds when each overhead strip switches on
+let spin = 0, lastCur = cur;
+const clock = new THREE.Clock();
+
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  cur += (target - cur) * (reduce ? 1 : 1 - Math.exp(-dt * 4));
+  const P = pose(cur);
+
+  // studio lights switching on, strip by strip, with a short fluorescent flicker
+  let lit = 1;
+  if (ready && !reduce) {
+    const t = (performance.now() - litAt) / 1000;
+    lit = 0;
+    stripsOn.forEach((s) => {
+      const k = t - s;
+      if (k > 0) lit += (k < 0.18 ? (Math.sin(k * 140) > 0.2 ? 1 : 0.15) : 1) / stripsOn.length;
+    });
+    pushIn = 1 + 0.08 * Math.pow(1 - Math.min(t / 3.2, 1), 3);
+  } else if (!ready) lit = 0;
+  scene.environmentIntensity = lit * 1.15;
+  poolMat.opacity = lit;
+  const lampT = ready ? Math.min(Math.max(((performance.now() - litAt) / 1000 - 1.7) / 0.6, 0), 1) : 0;
+  lamps.forEach((l) => (l.emissiveIntensity = (reduce ? 1 : lampT) * 2.2));
+
+  // wheels roll a little with scroll, and the front pair steers into each pose
+  spin += (cur - lastCur) * 26;
+  lastCur = cur;
+  for (const s of spinners) {
+    qa.setFromAxisAngle(AX_Z, spin);
+    if (s.front) qs.setFromAxisAngle(AX_Y, P.steer).multiply(qa); else qs.copy(qa);
+    s.o.quaternion.copy(qs).multiply(s.q0);
+  }
+  for (const s of steerers) s.o.quaternion.setFromAxisAngle(AX_Y, P.steer).multiply(s.q0);
+
+  // paint & option transitions
+  paint.color.lerp(goal.paint, 0.12);
+  alloy.color.lerp(goal.wheel, 0.12);
+  caliper.color.lerp(goal.caliper, 0.12);
+
+  const th = THREE.MathUtils.degToRad(P.th);
+  const mob = rScale > 1 ? P.m : 1;
+  const r = P.r * rScale * mob * pushIn;
+  camera.position.set(Math.cos(th) * r, P.h * rScale * mob, Math.sin(th) * r);
+  camera.lookAt(0, P.ty, 0);
+  renderer.render(scene, camera);
+});
+
+// --- configurator
+const outs = { paint: "out-paint", wheel: "out-wheel", caliper: "out-caliper" };
+document.querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => {
+  const k = b.dataset.k;
+  document.querySelectorAll(`.chip[data-k="${k}"]`).forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+  goal[k].set(b.dataset.v);
+  document.getElementById(outs[k]).textContent = b.dataset.n;
+}));
+
+// --- visit form (demo: confirms on the page)
+const form = document.getElementById("visit");
+const dateIn = document.getElementById("f-date");
+try { dateIn.min = new Date().toISOString().slice(0, 10); } catch (e) {}
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const done = document.getElementById("done");
+  const name = document.getElementById("f-name").value.trim();
+  const phone = document.getElementById("f-phone").value.trim();
+  const date = dateIn.value;
+  if (!name || !phone || !date) {
+    done.hidden = false;
+    done.innerHTML = "Preencha nome, WhatsApp e dia para pedir o horário.";
+    return;
+  }
+  const d = new Date(date + "T12:00:00");
+  const when = d.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+  done.hidden = false;
+  done.textContent = "";
+  done.append(`Pedido anotado: ${document.getElementById("f-car").value}, ${when}.`);
+  const sm = document.createElement("small");
+  sm.textContent = "Demonstração. Na versão da loja, o pedido vai direto para o WhatsApp da equipe.";
+  done.append(sm);
+});
+</script>
+
+</body>
+</html>
