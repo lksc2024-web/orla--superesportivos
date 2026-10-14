@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Imports Premium · Soluções Automotivas · Campo Grande, RJ</title>
+<meta name="description" content="Oficina mecânica em Campo Grande, Rio de Janeiro. Diagnóstico, serviços de motor e mecânica, com orçamento pelo WhatsApp. Rua Iviti, 64.">
+<meta property="og:title" content="Imports Premium · Soluções Automotivas">
+<meta property="og:description" content="Oficina mecânica em Campo Grande, RJ. Orçamento pelo WhatsApp (21) 98463-7839.">
+<meta property="og:image" content="/img/hero_wide.jpg">
+<meta name="theme-color" content="#0b0c0d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230b0c0d'/%3E%3Cpath d='M9 8h4v16H9zM16 8h5a5 5 0 0 1 0 10h-1v6h-4z' fill='%23f2a400'/%3E%3C/svg%3E">
+<link rel="preload" as="image" href="/img/hero_wide.webp" media="(min-width: 761px)">
+<link rel="preload" as="image" href="/img/hero_tall.webp" media="(max-width: 760px)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800&family=Onest:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --ink: #0b0c0d;
+  --ink-2: #131518;
+  --panel: #17191c;
+  --fg: #ecebe6;
+  --muted: #9a9b96;
+  --line: rgba(236, 235, 230, 0.12);
+  --amber: #f2a400;
+  --amber-ink: #1b1300;
+  --wa: #25d366;
+  --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --f-body: "Onest", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --gutter: max(20px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(20px, env(safe-area-inset-right, 0px));
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--ink); color: var(--fg); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+.wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-left: var(--gutter); padding-right: var(--gutter-r); }
+.eyebrow { font: 500 11px/1.4 var(--f-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.eyebrow b { color: var(--amber); font-weight: 500; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 800; text-transform: uppercase; letter-spacing: .005em; margin: 0; text-wrap: balance; }
+h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: .92; }
+h3 { font-size: 1.7rem; line-height: 1; font-weight: 700; }
+p { margin: 0; }
+.btn { display: inline-flex; align-items: center; gap: 10px; font: 600 15px/1 var(--f-body); text-decoration: none; padding: 17px 24px; border-radius: 2px; border: 0; cursor: pointer; transition: transform .25s, background-color .25s, color .25s; }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.btn-amber { background: var(--amber); color: var(--amber-ink); }
+.btn-amber:hover { transform: translateY(-2px); background: #ffb31a; }
+.btn-line { color: var(--fg); box-shadow: inset 0 0 0 1px rgba(236, 235, 230, .4); }
+.btn-line:hover { background: rgba(236, 235, 230, .08); }
+.btn:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+/* header */
+.top { position: fixed; z-index: 20; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px); transition: background-color .4s, border-color .4s; border-bottom: 1px solid transparent; }
+.top.solid { background: rgba(11, 12, 13, .86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom-color: var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 72px; }
+.mark { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.mark-glyph { width: 34px; height: 34px; flex: none; }
+.mark-name { font: 800 21px/0.9 var(--f-display); letter-spacing: .06em; text-transform: uppercase; }
+.mark-name small { display: block; font: 500 9.5px/1.4 var(--f-mono); letter-spacing: .22em; color: var(--muted); margin-top: 3px; }
+.top nav { display: flex; align-items: center; gap: 28px; font-size: 14px; }
+.top nav a:not(.btn) { color: var(--muted); text-decoration: none; transition: color .2s; }
+.top nav a:not(.btn):hover { color: var(--fg); }
+.top .btn { padding: 12px 16px; font-size: 14px; }
+
+/* hero */
+.hero { position: relative; height: 100vh; height: 100svh; min-height: 620px; overflow: hidden; background: var(--ink); }
+.hero-media { position: absolute; inset: -6% 0 -6% 0; will-change: transform; }
+.hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: 62% 50%; transform: scale(1.12); animation: settle 3.2s cubic-bezier(.2, .7, .1, 1) .15s forwards; }
+@keyframes settle { to { transform: scale(1.02); } }
+.hero::before, .hero::after { content: ""; position: absolute; left: 0; right: 0; height: 13vh; background: var(--ink); z-index: 3; animation: open 1.4s cubic-bezier(.7, 0, .2, 1) .25s forwards; }
+.hero::before { top: 0; }
+.hero::after { bottom: 0; }
+@keyframes open { to { height: 0; } }
+.sweep { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(105deg, transparent 38%, rgba(255, 196, 110, .16) 48%, rgba(255, 235, 200, .07) 52%, transparent 62%); background-size: 260% 100%; background-position: 130% 0; mix-blend-mode: screen; animation: sweep 2.6s ease-in-out 1.4s forwards; }
+@keyframes sweep { to { background-position: -40% 0; } }
+.hero-shade { position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(11, 12, 13, .92) 0%, rgba(11, 12, 13, .55) 38%, rgba(11, 12, 13, 0) 62%), linear-gradient(0deg, rgba(11, 12, 13, 1) 0%, rgba(11, 12, 13, 0) 30%); }
+.hero-copy { position: relative; z-index: 4; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: max(64px, 9vh); will-change: transform, opacity; }
+.hero h1 { font-size: clamp(3.2rem, 8.6vw, 7.6rem); line-height: .86; margin-top: 18px; max-width: 10ch; }
+.hero h1 .amb { color: var(--amber); }
+.hero .lede { max-width: 44ch; margin-top: 22px; color: #c9c8c2; font-size: 1.06rem; }
+.hero .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.rating { display: inline-flex; align-items: center; gap: 10px; margin-top: 30px; font: 500 12px/1 var(--f-mono); letter-spacing: .08em; color: var(--muted); }
+.rating .stars { color: var(--amber); letter-spacing: .1em; font-size: 13px; }
+.rating b { color: var(--fg); font-weight: 500; }
+.scroll-cue { position: absolute; z-index: 4; right: var(--gutter-r); bottom: max(64px, 9vh); font: 500 10.5px/1 var(--f-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-rl; display: flex; align-items: center; gap: 14px; }
+.scroll-cue::after { content: ""; width: 1px; height: 56px; background: linear-gradient(var(--amber), transparent); animation: drip 2s ease-in-out infinite; }
+@keyframes drip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+/* facts strip */
+.facts { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--ink-2); }
+.facts .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
+.fact { padding: 26px 0; display: grid; gap: 6px; }
+.fact + .fact { padding-left: 28px; border-left: 1px solid var(--line); }
+.fact b { font: 700 2rem/1 var(--f-display); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.fact span { font: 400 11px/1.4 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.open-now { display: inline-flex; align-items: center; gap: 8px; }
+.open-now i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.open-now.is-open i { background: var(--wa); box-shadow: 0 0 0 4px rgba(37, 211, 102, .15); }
+
+/* services */
+.section { padding-block: clamp(90px, 14vw, 160px); }
+.sec-head { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; margin-bottom: 64px; }
+.sec-head p { color: var(--muted); max-width: 46ch; justify-self: end; }
+.services { display: grid; gap: 22px; }
+.svc { position: relative; display: grid; grid-template-columns: 1.15fr 1fr; min-height: 440px; background: var(--panel); overflow: hidden; }
+.svc:nth-child(even) { grid-template-columns: 1fr 1.15fr; }
+.svc:nth-child(even) .svc-media { order: 2; }
+.svc-media { position: relative; overflow: hidden; min-height: 280px; }
+.svc-media img { position: absolute; left: 0; right: 0; top: -12%; width: 100%; height: 124%; object-fit: cover; will-change: transform; }
+.svc-body { padding: clamp(28px, 4vw, 56px); display: flex; flex-direction: column; justify-content: center; gap: 16px; min-width: 0; }
+.svc-num { font: 500 11px/1 var(--f-mono); letter-spacing: .2em; color: var(--amber); }
+.svc-body p { color: #bdbcb6; max-width: 40ch; }
+.svc-src { font: 400 11px/1.5 var(--f-mono); color: var(--muted); letter-spacing: .04em; margin-top: 6px; }
+.svc-link { align-self: flex-start; margin-top: 8px; font: 600 14px/1 var(--f-body); color: var(--amber); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
+.svc-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.svc-more { margin-top: 22px; padding: 22px 26px; border: 1px dashed var(--line); color: var(--muted); display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+
+/* reel: horizontal scroll, pinned */
+.reel { position: relative; height: 340vh; background: var(--ink); }
+.reel-pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+.reel-head { padding-bottom: 34px; display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
+.reel-track { display: flex; gap: 24px; padding-left: var(--gutter); will-change: transform; }
+.frame { position: relative; flex: none; width: min(68vw, 920px); aspect-ratio: 16 / 11; overflow: hidden; background: var(--panel); }
+.frame img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); transition: transform 1.2s cubic-bezier(.2, .7, .1, 1); }
+.frame:hover img { transform: scale(1.02); }
+.frame figcaption { position: absolute; left: 20px; bottom: 18px; right: 20px; display: flex; justify-content: space-between; gap: 12px; font: 500 11px/1.4 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: #d8d6cf; text-shadow: 0 1px 12px rgba(0, 0, 0, .8); }
+.reel-bar { margin-top: 30px; height: 2px; background: var(--line); position: relative; }
+.reel-bar i { position: absolute; inset: 0; background: var(--amber); transform-origin: left; transform: scaleX(0); }
+
+/* reviews */
+.reviews { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.review { padding: 30px 28px; border: 1px solid var(--line); display: grid; gap: 22px; align-content: space-between; background: linear-gradient(180deg, rgba(242, 164, 0, .04), transparent 60%); }
+.review blockquote { margin: 0; font: 500 1.35rem/1.3 var(--f-body); text-wrap: pretty; }
+.review footer { font: 400 11px/1.4 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+.review footer .stars { color: var(--amber); }
+
+/* quote builder */
+.quote { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(30px, 6vw, 90px); align-items: start; }
+.quote-copy p { color: var(--muted); margin-top: 18px; max-width: 42ch; }
+.qform { background: var(--panel); padding: clamp(24px, 3.5vw, 40px); display: grid; gap: 18px; border-top: 2px solid var(--amber); }
+.qform fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.qform legend, .qform label { display: block; font: 500 11px/1.4 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips input { position: absolute; opacity: 0; pointer-events: none; }
+.chips label { margin: 0; cursor: pointer; padding: 11px 14px; border: 1px solid var(--line); color: var(--fg); font: 500 14px/1 var(--f-body); letter-spacing: 0; text-transform: none; transition: background-color .2s, border-color .2s, color .2s; }
+.chips input:checked + label { background: var(--amber); border-color: var(--amber); color: var(--amber-ink); }
+.chips input:focus-visible + label { outline: 2px solid var(--amber); outline-offset: 2px; }
+.qform input[type="text"], .qform textarea { width: 100%; min-width: 0; background: var(--ink-2); border: 1px solid var(--line); color: var(--fg); font: 400 15px/1.4 var(--f-body); padding: 13px 14px; border-radius: 0; }
+.qform textarea { min-height: 96px; resize: vertical; }
+.qform .btn { justify-content: center; width: 100%; padding: 18px; }
+.qhint { font: 400 12px/1.5 var(--f-mono); color: var(--muted); }
+
+/* visit */
+.visit { display: grid; grid-template-columns: 1fr 1.2fr; gap: 0; background: var(--panel); }
+.visit-info { padding: clamp(28px, 4vw, 56px); display: grid; gap: 26px; align-content: start; }
+.visit-info dl { margin: 0; display: grid; gap: 18px; }
+.visit-info dt { font: 500 11px/1.4 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.visit-info dd { margin: 0; font-size: 1.05rem; }
+.hours { display: grid; grid-template-columns: auto 1fr; gap: 4px 20px; font-variant-numeric: tabular-nums; }
+.hours .today { color: var(--amber); }
+.map { position: relative; min-height: 420px; background: var(--ink-2); }
+.map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: grayscale(1) invert(.92) contrast(.9) brightness(.9); }
+
+/* footer */
+.foot { padding: 60px 0 calc(110px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); margin-top: clamp(90px, 14vw, 160px); }
+.foot .wrap { display: grid; gap: 22px; }
+.foot p { font: 400 12px/1.6 var(--f-mono); color: var(--muted); max-width: 90ch; }
+
+/* floating WhatsApp */
+.wa-float { position: fixed; z-index: 30; right: max(18px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); display: inline-flex; align-items: center; gap: 10px; background: var(--wa); color: #052e16; font: 600 15px/1 var(--f-body); text-decoration: none; padding: 14px 18px; border-radius: 999px; box-shadow: 0 10px 30px rgba(0, 0, 0, .45); transform: translateY(140%); transition: transform .5s cubic-bezier(.2, .7, .1, 1); }
+.wa-float.show { transform: none; }
+.wa-float svg { width: 22px; height: 22px; }
+
+/* reveal (content stays visible without JS) */
+.js .rv { opacity: 0; transform: translateY(28px); transition: opacity .9s cubic-bezier(.2, .7, .1, 1), transform .9s cubic-bezier(.2, .7, .1, 1); }
+.js .rv.in { opacity: 1; transform: none; }
+
+@media (max-width: 960px) {
+  .top nav a:not(.btn) { display: none; }
+  .sec-head { grid-template-columns: 1fr; gap: 18px; margin-bottom: 40px; }
+  .sec-head p { justify-self: start; }
+  .svc, .svc:nth-child(even) { grid-template-columns: 1fr; min-height: 0; }
+  .svc:nth-child(even) .svc-media { order: 0; }
+  .svc-media { aspect-ratio: 16 / 10; min-height: 0; }
+  .reviews { grid-template-columns: 1fr; }
+  .quote { grid-template-columns: 1fr; }
+  .visit { grid-template-columns: 1fr; }
+  .map { min-height: 320px; }
+}
+@media (max-width: 760px) {
+  .top .wrap { height: 64px; }
+  .top .btn span { display: none; }
+  .top .btn { padding: 11px 13px; }
+  .mark-name { font-size: 18px; }
+  .hero-media img { object-position: 50% 50%; }
+  .hero-shade { background: linear-gradient(0deg, rgba(11, 12, 13, 1) 0%, rgba(11, 12, 13, .82) 38%, rgba(11, 12, 13, 0) 66%); }
+  .hero h1 { font-size: clamp(2.9rem, 15vw, 4.6rem); }
+  .hero .lede { font-size: 1rem; }
+  .hero .actions .btn { flex: 1 1 100%; justify-content: center; }
+  .scroll-cue { display: none; }
+  .facts .wrap { grid-template-columns: 1fr 1fr; }
+  .fact { padding: 20px 0; }
+  .fact + .fact { padding-left: 0; border-left: 0; }
+  .fact:nth-child(even) { padding-left: 18px; border-left: 1px solid var(--line); }
+  .fact:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .reel { height: 300vh; }
+  .frame { width: 82vw; }
+  .review blockquote { font-size: 1.2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero::before, .hero::after { display: none; }
+  .hero-media img, .sweep, .scroll-cue::after { animation: none; transform: none; }
+  .sweep { display: none; }
+  .js .rv { opacity: 1; transform: none; transition: none; }
+  .reel { height: auto; }
+  .reel-pin { position: static; height: auto; padding-block: 90px; }
+  .reel-track { overflow-x: auto; padding-right: var(--gutter-r); scroll-snap-type: x mandatory; }
+  .frame { scroll-snap-align: start; }
+}
+</style>
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="mark" href="#inicio" aria-label="Imports Premium, início">
+      <svg class="mark-glyph" viewBox="0 0 34 34" aria-hidden="true"><rect x="0.5" y="0.5" width="33" height="33" rx="3" fill="none" stroke="rgba(236,235,230,.35)"/><path d="M9 8h4v18H9zM16 8h5.5a5.5 5.5 0 0 1 0 11H20v7h-4z" fill="#f2a400"/></svg>
+      <span class="mark-name">Imports Premium<small>Soluções Automotivas</small></span>
+    </a>
+    <nav aria-label="Seções">
+      <a href="#servicos">Serviços</a>
+      <a href="#avaliacoes">Avaliações</a>
+      <a href="#visita">Como chegar</a>
+      <a class="btn btn-amber" data-wa="topo" href="https://wa.me/5521984637839?text=Ol%C3%A1%2C%20vim%20pelo%20site%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3c.2-.4.2-.9.2-1l-.1-.2z"/></svg>
+        <span>Orçamento</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="inicio" aria-label="Apresentação">
+    <div class="hero-media" data-speed="0.35">
+      <picture>
+        <source media="(max-width: 760px)" srcset="/img/hero_tall.webp" type="image/webp">
+        <source media="(max-width: 760px)" srcset="/img/hero_tall.jpg">
+        <source srcset="/img/hero_wide.webp" type="image/webp">
+        <img src="/img/hero_wide.jpg" alt="Ilustração em 3D de um superesportivo grafite em estúdio escuro, iluminado por luz âmbar" width="2400" height="1350" fetchpriority="high">
+      </picture>
+    </div>
+    <div class="hero-shade"></div>
+    <div class="sweep"></div>
+    <div class="wrap hero-copy" id="hero-copy">
+      <div class="eyebrow"><b>Oficina mecânica</b> · Campo Grande, Rio de Janeiro</div>
+      <h1>Diagnóstico <span class="amb">preciso</span> para o seu carro</h1>
+      <p class="lede">Mecânica e serviços de motor na Rua Iviti, 64. Conte o que o carro está apresentando e receba o orçamento pelo WhatsApp.</p>
+      <div class="actions">
+        <a class="btn btn-amber" data-wa="hero" href="https://wa.me/5521984637839?text=Ol%C3%A1%2C%20vim%20pelo%20site%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3c.2-.4.2-.9.2-1l-.1-.2z"/></svg>
+          Pedir orçamento no WhatsApp
+        </a>
+        <a class="btn btn-line" href="#servicos">Ver serviços</a>
+      </div>
+      <div class="rating" aria-label="Nota 5,0 de 5 no Google, 9 avaliações"><span class="stars" aria-hidden="true">★★★★★</span><b>5,0</b> no Google · 9 avaliações</div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">Role</div>
+  </section>
+
+  <section class="facts" aria-label="Informações rápidas">
+    <div class="wrap">
+      <div class="fact"><b>5,0</b><span>Nota no Google</span></div>
+      <div class="fact"><b>8h–18h</b><span>Segunda a sexta</span></div>
+      <div class="fact"><b>8h–12h</b><span>Sábado</span></div>
+      <div class="fact"><b class="open-now" id="open-now"><i></i><span id="open-txt">Horário</span></b><span id="open-sub">Horário de Brasília</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="servicos">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow rv">Serviços</div>
+          <h2 class="rv">O que a oficina faz</h2>
+        </div>
+        <p class="rv">Listamos aqui só o que está confirmado no perfil da oficina e nas avaliações de clientes. Para outros serviços, pergunte pelo WhatsApp.</p>
+      </div>
+
+      <div class="services">
+        <article class="svc rv">
+          <div class="svc-media"><picture><source srcset="/img/wheel.webp" type="image/webp"><img src="/img/wheel.jpg" alt="Ilustração em 3D de roda e pinça de freio em luz âmbar" loading="lazy" width="1600" height="1100" data-speed="0.12"></picture></div>
+          <div class="svc-body">
+            <span class="svc-num">01</span>
+            <h3>Mecânica</h3>
+            <p>Oficina mecânica com atendimento de segunda a sábado. Leve o carro ou descreva o problema antes pelo WhatsApp.</p>
+            <span class="svc-src">Fonte: perfil da oficina no Google</span>
+            <a class="svc-link" data-wa="mecanica" href="https://wa.me/5521984637839?text=Ol%C3%A1%2C%20vim%20pelo%20site.%20Gostaria%20de%20um%20or%C3%A7amento%20de%20mec%C3%A2nica." target="_blank" rel="noopener">Pedir orçamento →</a>
+          </div>
+        </article>
+
+        <article class="svc rv">
+          <div class="svc-media"><picture><source srcset="/img/engine.webp" type="image/webp"><img src="/img/engine.jpg" alt="Ilustração em 3D da tampa do motor de um esportivo, vista de cima" loading="lazy" width="1600" height="1100" data-speed="0.12"></picture></div>
+          <div class="svc-body">
+            <span class="svc-num">02</span>
+            <h3>Motor</h3>
+            <p>Serviços de motor. Um cliente conta no Google que fez o motor do Peugeot 206 na oficina e que o carro ficou como novo.</p>
+            <span class="svc-src">Fonte: avaliação de cliente no Google</span>
+            <a class="svc-link" data-wa="motor" href="https://wa.me/5521984637839?text=Ol%C3%A1%2C%20vim%20pelo%20site.%20Gostaria%20de%20um%20or%C3%A7amento%20de%20servi%C3%A7o%20de%20motor." target="_blank" rel="noopener">Pedir orçamento →</a>
+          </div>
+        </article>
+
+        <article class="svc rv">
+          <div class="svc-media"><picture><source srcset="/img/headlight.webp" type="image/webp"><img src="/img/headlight.jpg" alt="Ilustração em 3D do farol de um esportivo aceso" loading="lazy" width="1600" height="1100" data-speed="0.12"></picture></div>
+          <div class="svc-body">
+            <span class="svc-num">03</span>
+            <h3>Diagnóstico</h3>
+            <p>Diagnóstico com equipamentos modernos, como destacam os clientes, e orçamento explicado antes do serviço.</p>
+            <span class="svc-src">Fonte: avaliações de clientes no Google</span>
+            <a class="svc-link" data-wa="diagnostico" href="https://wa.me/5521984637839?text=Ol%C3%A1%2C%20vim%20pelo%20site.%20Gostaria%20de%20agendar%20um%20diagn%C3%B3stico." target="_blank" rel="noopener">Agendar diagnóstico →</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="svc-more rv">
+        <span>Precisa de outro serviço? Pergunte direto para a equipe.</span>
+        <a class="svc-link" data-wa="outros" href="https://wa.me/5521984637839?text=Ol%C3%A1%2C%20vim%20pelo%20site.%20Voc%C3%AAs%20fazem%20este%20servi%C3%A7o%3F" target="_blank" rel="noopener">Perguntar no WhatsApp →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="reel" id="reel" aria-label="Galeria ilustrativa">
+    <div class="reel-pin">
+      <div class="wrap reel-head">
+        <div>
+          <div class="eyebrow">Cuidado em cada detalhe</div>
+          <h2>Do farol ao escapamento</h2>
+        </div>
+        <span class="eyebrow">Imagens ilustrativas em 3D</span>
+      </div>
+      <div class="reel-track" id="reel-track">
+        <figure class="frame"><picture><source srcset="/img/rear.webp" type="image/webp"><img src="/img/rear.jpg" alt="Ilustração em 3D da traseira de um esportivo com lanternas acesas" loading="lazy" width="1600" height="1100"></picture><figcaption><span>Traseira e lanternas</span><span>01</span></figcaption></figure>
+        <figure class="frame"><picture><source srcset="/img/wheel.webp" type="image/webp"><img src="/img/wheel.jpg" alt="Ilustração em 3D de roda e freio" loading="lazy" width="1600" height="1100"></picture><figcaption><span>Rodas e freios</span><span>02</span></figcaption></figure>
+        <figure class="frame"><picture><source srcset="/img/headlight.webp" type="image/webp"><img src="/img/headlight.jpg" alt="Ilustração em 3D de farol aceso" loading="lazy" width="1600" height="1100"></picture><figcaption><span>Iluminação</span><span>03</span></figcaption></figure>
+        <figure class="frame"><picture><source srcset="/img/engine.webp" type="image/webp"><img src="/img/engine.jpg" alt="Ilustração em 3D da tampa do motor" loading="lazy" width="1600" height="1100"></picture><figcaption><span>Motor</span><span>04</span></figcaption></figure>
+      </div>
+      <div class="wrap"><div class="reel-bar"><i id="reel-bar"></i></div></div>
+    </div>
+  </section>
+
+  <section class="section" id="avaliacoes">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow rv">Avaliações no Google</div>
+          <h2 class="rv">Nota 5,0 dos clientes</h2>
+        </div>
+        <p class="rv">Trechos de avaliações públicas no perfil da oficina no Google.</p>
+      </div>
+      <div class="reviews">
+        <figure class="review rv"><blockquote>“Orçamento sincero e muita qualidade na mão de obra.”</blockquote><footer><span>Cliente</span><span class="stars" aria-label="5 estrelas">★★★★★</span></footer></figure>
+        <figure class="review rv"><blockquote>“Diagnóstico preciso e com equipamentos modernos.”</blockquote><footer><span>Cliente</span><span class="stars" aria-label="5 estrelas">★★★★★</span></footer></figure>
+        <figure class="review rv"><blockquote>“Honestidade e preço justo pela qualidade do serviço.”</blockquote><footer><span>Cliente</span><span class="stars" aria-label="5 estrelas">★★★★★</span></footer></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="orcamento" style="padding-top:0">
+    <div class="wrap quote">
+      <div class="quote-copy">
+        <div class="eyebrow rv">Orçamento</div>
+        <h2 class="rv">Monte o pedido e envie pelo WhatsApp</h2>
+        <p class="rv">Escolha o serviço, diga qual é o carro e o que ele está apresentando. A mensagem já vai pronta para a equipe da oficina.</p>
+      </div>
+      <form class="qform rv" id="qform" novalidate>
+        <fieldset>
+          <legend>Serviço</legend>
+          <div class="chips">
+            <input type="radio" name="svc" id="s-mec" value="Mecânica" checked><label for="s-mec">Mecânica</label>
+            <input type="radio" name="svc" id="s-mot" value="Motor"><label for="s-mot">Motor</label>
+            <input type="radio" name="svc" id="s-diag" value="Diagnóstico"><label for="s-diag">Diagnóstico</label>
+            <input type="radio" name="svc" id="s-out" value="Outro serviço"><label for="s-out">Outro</label>
+          </div>
+        </fieldset>
+        <div><label for="q-car">Carro, ano e modelo</label><input type="text" id="q-car" name="car" placeholder="Ex.: Peugeot 206 2008" autocomplete="off"></div>
+        <div><label for="q-msg">O que está acontecendo</label><textarea id="q-msg" name="msg" placeholder="Ex.: barulho na suspensão ao passar em buraco"></textarea></div>
+        <div><label for="q-name">Seu nome</label><input type="text" id="q-name" name="name" autocomplete="name"></div>
+        <button class="btn btn-amber" type="submit">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3c.2-.4.2-.9.2-1l-.1-.2z"/></svg>
+          Enviar pelo WhatsApp
+        </button>
+        <p class="qhint" id="qhint">Abre o WhatsApp com a mensagem pronta para (21) 98463-7839.</p>
+      </form>
+    </div>
+  </section>
+
+  <section id="visita">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow rv">Como chegar</div>
+          <h2 class="rv">Rua Iviti, 64</h2>
+        </div>
+        <p class="rv">Campo Grande, zona oeste do Rio de Janeiro.</p>
+      </div>
+      <div class="visit rv">
+        <div class="visit-info">
+          <dl>
+            <div><dt>Endereço</dt><dd>R. Iviti, 64 · Campo Grande<br>Rio de Janeiro · RJ · 23095-440</dd></div>
+            <div><dt>WhatsApp e telefone</dt><dd><a href="https://wa.me/5521984637839" target="_blank" rel="noopener" data-wa="visita">(21) 98463-7839</a></dd></div>
+            <div><dt>Horários</dt><dd class="hours" id="hours">
+              <span data-d="1">Segunda</span><span data-d="1">8h às 18h</span>
+              <span data-d="2">Terça</span><span data-d="2">8h às 18h</span>
+              <span data-d="3">Quarta</span><span data-d="3">8h às 18h</span>
+              <span data-d="4">Quinta</span><span data-d="4">8h às 18h</span>
+              <span data-d="5">Sexta</span><span data-d="5">8h às 18h</span>
+              <span data-d="6">Sábado</span><span data-d="6">8h às 12h</span>
+              <span data-d="0">Domingo</span><span data-d="0">Fechado</span>
+            </dd></div>
+          </dl>
+          <a class="btn btn-line" href="https://www.google.com/maps/search/?api=1&amp;query=Imports%20Premium%20Solu%C3%A7%C3%B5es%20Automotivas&amp;query_place_id=ChIJGa3dY4HhmwARuVulYmxLlPo" target="_blank" rel="noopener">Abrir no Google Maps</a>
+        </div>
+        <div class="map" id="map" data-src="https://www.google.com/maps?q=R.+Iviti,+64+-+Campo+Grande,+Rio+de+Janeiro+-+RJ,+23095-440&amp;output=embed"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a class="mark" href="#inicio" aria-label="Voltar ao início">
+      <svg class="mark-glyph" viewBox="0 0 34 34" aria-hidden="true"><rect x="0.5" y="0.5" width="33" height="33" rx="3" fill="none" stroke="rgba(236,235,230,.35)"/><path d="M9 8h4v18H9zM16 8h5.5a5.5 5.5 0 0 1 0 11H20v7h-4z" fill="#f2a400"/></svg>
+      <span class="mark-name">Imports Premium<small>Soluções Automotivas</small></span>
+    </a>
+    <p>Prévia de site desenvolvida para apresentação comercial à Imports Premium. As imagens de veículos são ilustrações geradas em 3D: não são fotos da oficina nem de carros atendidos por ela. Endereço, telefone, horários, nota e trechos de avaliações vêm do perfil público da oficina no Google.</p>
+  </div>
+</footer>
+
+<a class="wa-float" id="wa-float" data-wa="flutuante" href="https://wa.me/5521984637839?text=Ol%C3%A1%2C%20vim%20pelo%20site%20e%20gostaria%20de%20um%20or%C3%A7amento." target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3c.2-.4.2-.9.2-1l-.1-.2z"/></svg>
+  <span>WhatsApp</span>
+</a>
+
+<script>
+(() => {
+  const WA = "5521984637839";
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // open / closed, computed in Rio de Janeiro time
+  const HOURS = { 0: null, 1: [8, 18], 2: [8, 18], 3: [8, 18], 4: [8, 18], 5: [8, 18], 6: [8, 12] };
+  function rioNow() {
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Sao_Paulo", weekday: "short", hour: "numeric", minute: "numeric", hour12: false }).formatToParts(new Date());
+    const get = (t) => parts.find((p) => p.type === t).value;
+    const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(get("weekday"));
+    return { day, h: (+get("hour") % 24) + (+get("minute")) / 60 };
+  }
+  function paintHours() {
+    const { day, h } = rioNow();
+    const span = HOURS[day];
+    const open = !!span && h >= span[0] && h < span[1];
+    $("#open-now").classList.toggle("is-open", open);
+    $("#open-txt").textContent = open ? "Aberto" : "Fechado";
+    let sub = "";
+    if (open) sub = `Até ${span[1]}h hoje`;
+    else {
+      for (let k = 0; k < 7; k++) {
+        const d = (day + k) % 7, s = HOURS[d];
+        if (!s) continue;
+        if (k === 0 && h < s[0]) { sub = `Abre hoje às ${s[0]}h`; break; }
+        if (k > 0) { sub = `Abre ${k === 1 ? "amanhã" : ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"][d]} às ${s[0]}h`; break; }
+      }
+    }
+    $("#open-sub").textContent = sub;
+    $$("#hours [data-d]").forEach((el) => el.classList.toggle("today", +el.dataset.d === day));
+  }
+  paintHours();
+  setInterval(paintHours, 60000);
+
+  // header and floating button
+  const top = $("#top"), wa = $("#wa-float");
+  // reveal on scroll
+  const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" }) : null;
+  $$(".rv").forEach((el) => io ? io.observe(el) : el.classList.add("in"));
+
+  // lazy map
+  const map = $("#map");
+  if (map && io) {
+    const mio = new IntersectionObserver((es) => { if (es[0].isIntersecting) { const f = document.createElement("iframe"); f.src = map.dataset.src; f.title = "Mapa da Imports Premium"; f.loading = "lazy"; f.referrerPolicy = "no-referrer-when-downgrade"; map.appendChild(f); mio.disconnect(); } }, { rootMargin: "300px" });
+    mio.observe(map);
+  }
+
+  // scroll-driven motion: hero parallax, image parallax, pinned horizontal reel
+  const heroMedia = $(".hero-media"), heroCopy = $("#hero-copy");
+  const para = $$(".svc-media img");
+  const reel = $("#reel"), track = $("#reel-track"), bar = $("#reel-bar");
+  let ticking = false;
+  function frame() {
+    ticking = false;
+    const y = scrollY, vh = innerHeight;
+    top.classList.toggle("solid", y > 40);
+    wa.classList.toggle("show", y > vh * 0.6);
+    if (reduce) return;
+    if (y < vh * 1.2) {
+      heroMedia.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
+      heroCopy.style.transform = `translate3d(0, ${y * -0.12}px, 0)`;
+      heroCopy.style.opacity = String(Math.max(0, 1 - y / (vh * 0.75)));
+    }
+    for (const img of para) {
+      const r = img.parentElement.parentElement.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) continue;
+      const p = (r.top + r.height / 2 - vh / 2) / vh;
+      img.style.transform = `translate3d(0, ${p * -60}px, 0)`;
+    }
+    const rr = reel.getBoundingClientRect();
+    const span = reel.offsetHeight - vh;
+    const t = Math.min(Math.max(-rr.top / span, 0), 1);
+    const max = track.scrollWidth - innerWidth + 40;
+    track.style.transform = `translate3d(${-t * Math.max(max, 0)}px, 0, 0)`;
+    bar.style.transform = `scaleX(${t})`;
+  }
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
+  addEventListener("resize", frame);
+  frame();
+
+  // quote builder -> WhatsApp
+  $("#qform").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const svc = ($("input[name=svc]:checked") || {}).value || "Orçamento";
+    const car = $("#q-car").value.trim();
+    const msg = $("#q-msg").value.trim();
+    const name = $("#q-name").value.trim();
+    if (!car) { $("#qhint").textContent = "Informe o carro para a oficina já saber do que se trata."; $("#q-car").focus(); return; }
+    const lines = [`Olá, vim pelo site da Imports Premium.`, `Serviço: ${svc}`, `Carro: ${car}`];
+    if (msg) lines.push(`O que está acontecendo: ${msg}`);
+    if (name) lines.push(`Nome: ${name}`);
+    const url = `https://wa.me/${WA}?text=${encodeURIComponent(lines.join("\n"))}`;
+    $("#qhint").textContent = "Abrindo o WhatsApp com a mensagem pronta.";
+    window.open(url, "_blank", "noopener");
+  });
+})();
+</script>
+</body>
+</html>
