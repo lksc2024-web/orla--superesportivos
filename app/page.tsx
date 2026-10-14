@@ -1,6 +1,6 @@
 import Effects from "@/components/Effects";
 import Header from "@/components/Header";
-import HeroDepth from "@/components/HeroDepth";
+import Hero3D from "@/components/Hero3D";
 import Maquete from "@/components/Maquete";
 import Picture from "@/components/Picture";
 import { contact, fields, gallery, largest, pillars, services, whatsappHref } from "@/lib/site";
@@ -34,7 +34,7 @@ export default function Home() {
       <main id="conteudo">
         {/* ---------- hero ---------- */}
         <section id="inicio" className="hero" aria-label="Apresentação">
-          <HeroDepth alt="Estudo 3D de sala de estar: sofá de veludo ameixa, parede em ripado de madeira e luz da tarde entrando por uma janela do piso ao teto." />
+          <Hero3D alt="Estudo 3D de sala de estar: sofá de veludo ameixa, parede em ripado de madeira e luz da tarde entrando por uma janela do piso ao teto." />
           <div className="hero-shade" />
           <div data-hero-copy className="wrap relative z-10 flex h-full flex-col justify-end pb-[calc(48px+env(safe-area-inset-bottom,0px))] md:pb-16">
             <p className="label fade-up mb-6 opacity-90">Arq. Fernanda Moraes · Neuroarquitetura e Interiores</p>
@@ -52,7 +52,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <p className="absolute bottom-4 right-[var(--gutter)] z-10 hidden text-[11px] tracking-wide text-paper/60 md:block">Estudo conceitual em 3D · imagem ilustrativa</p>
+          <p className="absolute bottom-4 right-[var(--gutter)] z-10 hidden text-[11px] tracking-wide text-paper/60 md:block">Maquete 3D interativa · estudo conceitual</p>
           <div className="absolute bottom-0 left-1/2 z-10 hidden -translate-x-1/2 md:block"><div className="scroll-cue" /></div>
         </section>
 
