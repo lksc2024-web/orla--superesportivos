@@ -563,7 +563,8 @@ p { margin: 0; }
 } }
 </script>
 <script type="module">
-// Live 3D hero. The rendered poster image stays underneath until the first 3D frame is ready.
+// Live 3D hero: the car turns on a showroom turntable and opens its scissor doors in a loop.
+// The rendered poster image stays underneath until the first 3D frame is ready.
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
@@ -574,16 +575,76 @@ const hero = document.getElementById("inicio");
 const small = () => innerWidth <= 760;
 if (canvas && !matchMedia("(prefers-reduced-motion: reduce)").matches) { try { start(); } catch (e) { /* the poster image stays */ } }
 
+// Splits the "Obj_Side_Doors" node into a left and a right door hung on hinges.
+// Everything is baked into the car root's own space (x = length, y = up, z = width),
+// so the split and the hinge do not depend on how the node was exported.
+// Scissor doors swing up around a lateral axis near the front of the door, tilting slightly outward.
+function makeDoors(THREE, root) {
+  const node = root.getObjectByName("Obj_Side_Doors");
+  if (!node) return null;
+  const parts = [];
+  node.traverse((o) => { if (o.isMesh) parts.push(o); });
+  if (!parts.length) return null;
+  root.updateMatrixWorld(true);
+  const rootInv = root.matrixWorld.clone().invert();
+  const baked = parts.map((p) => ({ geo: p.geometry.clone().applyMatrix4(rootInv.clone().multiply(p.matrixWorld)), mat: p.material, order: p.renderOrder }));
+
+  function split(g, sign) {
+    const pos = g.attributes.position, idx = g.index ? g.index.array : null;
+    const n = idx ? idx.length : pos.count;
+    const groups = g.groups.length ? g.groups : [{ start: 0, count: n, materialIndex: 0 }];
+    const out = [], ng = [];
+    for (const gr of groups) {
+      const start = out.length;
+      for (let k = gr.start; k < gr.start + gr.count; k += 3) {
+        const a = idx ? idx[k] : k, b = idx ? idx[k + 1] : k + 1, c = idx ? idx[k + 2] : k + 2;
+        if (Math.sign(pos.getZ(a) + pos.getZ(b) + pos.getZ(c)) === sign) out.push(a, b, c);
+      }
+      if (out.length > start) ng.push({ start, count: out.length - start, materialIndex: gr.materialIndex });
+    }
+    const geo = new THREE.BufferGeometry();
+    for (const name in g.attributes) geo.setAttribute(name, g.attributes[name]);
+    geo.setIndex(out);
+    ng.forEach((x) => geo.addGroup(x.start, x.count, x.materialIndex));
+    geo.computeBoundingBox(); geo.computeBoundingSphere();
+    return geo;
+  }
+
+  const bb = new THREE.Box3();
+  for (const b of baked) { b.geo.computeBoundingBox(); bb.union(b.geo.boundingBox); }
+  const hinge = new THREE.Vector3(bb.min.x + (bb.max.x - bb.min.x) * 0.04, bb.min.y + (bb.max.y - bb.min.y) * 0.6, 0);
+
+  const doors = [];
+  for (const sign of [1, -1]) {
+    const pivot = new THREE.Object3D();
+    pivot.position.copy(hinge);
+    for (const b of baked) {
+      const m = new THREE.Mesh(split(b.geo, sign), b.mat);
+      m.position.copy(hinge).negate();
+      m.renderOrder = b.order;
+      pivot.add(m);
+    }
+    root.add(pivot);
+    doors.push({ pivot, sign });
+  }
+  node.visible = false;
+  return {
+    hinge, bounds: bb,
+    set(t) { // 0 closed .. 1 open
+      const e = t * t * (3 - 2 * t);
+      for (const d of doors) d.pivot.rotation.set(0.14 * d.sign * e, 0, 1.12 * e);
+    },
+  };
+}
+
 function start() {
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-
 renderer.setPixelRatio(Math.min(devicePixelRatio, small() ? 1.25 : 1.5));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.35;
 
-const BG = new THREE.Color("#0b0c0d");
 const scene = new THREE.Scene();
-scene.background = BG;
+scene.background = new THREE.Color("#0b0c0d");
 
 function studioEnv() {
   const env = new THREE.Scene();
@@ -612,13 +673,14 @@ function radial(stops, size = 512) {
   stops.forEach(([o, col]) => gr.addColorStop(o, col)); g.fillStyle = gr; g.fillRect(0, 0, size, size);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
-if (!small()) {
+const mobile = small();
+if (!mobile) {
   const mirror = new Reflector(new THREE.CircleGeometry(30, 96), { color: 0x6a6a6a, textureWidth: 1024, textureHeight: 1024, clipBias: 0.003 });
   mirror.rotation.x = -Math.PI / 2; scene.add(mirror);
 }
 const veil = new THREE.Mesh(new THREE.CircleGeometry(30, 96), new THREE.MeshBasicMaterial({
-  map: small() ? radial([[0, "rgba(24,22,20,1)"], [0.4, "rgba(14,14,15,1)"], [1, "rgba(11,12,13,1)"]])
-               : radial([[0, "rgba(11,12,13,0.78)"], [0.16, "rgba(11,12,13,0.87)"], [0.4, "rgba(11,12,13,1)"], [1, "rgba(11,12,13,1)"]]),
+  map: mobile ? radial([[0, "rgba(24,22,20,1)"], [0.4, "rgba(14,14,15,1)"], [1, "rgba(11,12,13,1)"]])
+              : radial([[0, "rgba(11,12,13,0.78)"], [0.16, "rgba(11,12,13,0.87)"], [0.4, "rgba(11,12,13,1)"], [1, "rgba(11,12,13,1)"]]),
   transparent: true, depthWrite: false, toneMapped: false }));
 veil.rotation.x = -Math.PI / 2; veil.position.y = 0.002; scene.add(veil);
 const pool = new THREE.Mesh(new THREE.PlaneGeometry(14, 9), new THREE.MeshBasicMaterial({
@@ -626,11 +688,24 @@ const pool = new THREE.Mesh(new THREE.PlaneGeometry(14, 9), new THREE.MeshBasicM
   transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
 pool.rotation.x = -Math.PI / 2; pool.position.y = 0.004; scene.add(pool);
 
+// showroom turntable: dark disc with a thin amber edge
+const stage = new THREE.Group(); scene.add(stage);
+const disc = new THREE.Mesh(new THREE.CylinderGeometry(2.85, 2.9, 0.05, 96), new THREE.MeshStandardMaterial({ color: 0x121314, metalness: 0.6, roughness: 0.35 }));
+disc.position.y = 0.025; stage.add(disc);
+const ring = new THREE.Mesh(new THREE.TorusGeometry(2.87, 0.008, 8, 160), new THREE.MeshBasicMaterial({ color: new THREE.Color("#f2a400").multiplyScalar(0.55) }));
+ring.rotation.x = Math.PI / 2; ring.position.y = 0.052; stage.add(ring);
+const marks = new THREE.Group();
+for (let i = 0; i < 24; i++) {
+  const tick = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.004, 0.012), new THREE.MeshBasicMaterial({ color: 0x3a3b3d }));
+  const a = (i / 24) * Math.PI * 2; tick.position.set(Math.cos(a) * 2.7, 0.052, Math.sin(a) * 2.7); tick.rotation.y = -a; marks.add(tick);
+}
+stage.add(marks);
+
 const camera = new THREE.PerspectiveCamera(27, 1, 0.05, 120);
-// framing that matches the poster renders: [distance, height, azimuth, look, fov, view shift]
+// desktop matches the poster render; phone sits farther back so the whole car and turntable fit
 const FRAME = {
-  wide: { pos: new THREE.Vector3(-5.0, 0.62, 3.35), look: new THREE.Vector3(0.15, 0.5, 0), fov: 27, shift: [-0.13, 0.03] },
-  tall: { pos: new THREE.Vector3(-5.9, 0.95, 4.4), look: new THREE.Vector3(-0.1, 0.45, 0), fov: 34, shift: [0, 0.12] },
+  wide: { pos: new THREE.Vector3(-5.0, 0.62, 3.35), look: new THREE.Vector3(0.15, 0.5, 0), fov: 27, shift: [-0.22, 0.03] },
+  tall: { pos: new THREE.Vector3(-9.08, 3.0, 8.47), look: new THREE.Vector3(0, 0.4, 0), fov: 46, shift: [0, 0.22] },
 };
 let F = FRAME.wide, baseR = 0, baseAz = 0;
 function resize() {
@@ -639,7 +714,7 @@ function resize() {
   renderer.setSize(w, h, false);
   F = small() ? FRAME.tall : FRAME.wide;
   const d = F.pos.clone().sub(F.look);
-  baseR = Math.hypot(d.x, d.z); baseAz = Math.atan2(d.z, d.x);
+  baseR = Math.hypot(d.x, d.z) * (small() ? 1 : 1.22); baseAz = Math.atan2(d.z, d.x);
   camera.fov = F.fov; camera.aspect = w / h;
   camera.setViewOffset(w, h, F.shift[0] * w, F.shift[1] * h, w, h);
   camera.updateProjectionMatrix();
@@ -650,6 +725,7 @@ const paint = new THREE.MeshPhysicalMaterial({ color: "#2b2e31", metalness: 0.75
 const alloy = new THREE.MeshPhysicalMaterial({ color: "#0a0a0a", metalness: 0.9, roughness: 0.2, clearcoat: 0.6 });
 const caliper = new THREE.MeshStandardMaterial({ color: "#f2a400", metalness: 0.25, roughness: 0.35 });
 const lamps = [];
+let doors = null;
 
 const draco = new DRACOLoader();
 draco.setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/");
@@ -658,7 +734,7 @@ const loader = new GLTFLoader(); loader.setDRACOLoader(draco);
 let ready = false, visible = true, shownAt = 0;
 loader.load("/car.glb", (gltf) => {
   const m = gltf.scene; const S = 0.176;
-  m.scale.setScalar(S); m.position.x = 0.6 * S;
+  m.scale.setScalar(S); m.position.set(0.6 * S, 0.05, 0);
   m.traverse((o) => {
     if (!o.isMesh) return;
     const mats = Array.isArray(o.material) ? o.material : [o.material];
@@ -682,29 +758,44 @@ loader.load("/car.glb", (gltf) => {
     if (/^Obj_(Rim_T0A|Tyre|DiscRotor|WheelHub|Caliper)_F[LR]$/.test(o.name))
       o.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -0.3));
   });
-  scene.add(m);
+  stage.add(m);
+  try { doors = makeDoors(THREE, m); } catch (e) { doors = null; }
   resize();
   renderer.render(scene, camera);
   ready = true; shownAt = performance.now();
   requestAnimationFrame(() => { canvas.classList.add("on"); document.getElementById("badge3d")?.classList.add("on"); });
 }, undefined, () => {}); // on failure the poster image simply stays
 
-// pointer and scroll drive the camera a little; a slow drift keeps it alive
 let px = 0, py = 0, tx = 0, ty = 0;
 addEventListener("pointermove", (e) => { tx = e.clientX / innerWidth - 0.5; ty = e.clientY / innerHeight - 0.5; }, { passive: true });
 if ("IntersectionObserver" in window) new IntersectionObserver((es) => { visible = es[0].isIntersecting; }).observe(hero);
 
-const clock = new THREE.Clock();
+// choreography, in seconds after the 3D appears
+const SPIN = (Math.PI * 2) / 30;   // one full turn every 30 s
+const CYCLE = 14;                  // doors: open at 3 s, hold, close at 9 s, repeat
+function doorState(t) {
+  const k = ((t % CYCLE) + CYCLE) % CYCLE;
+  if (k < 3) return 0;
+  if (k < 4.6) return (k - 3) / 1.6;
+  if (k < 9) return 1;
+  if (k < 10.6) return 1 - (k - 9) / 1.6;
+  return 0;
+}
+let angle = 0, last = performance.now();
 renderer.setAnimationLoop(() => {
+  const now = performance.now();
+  const dt = Math.min((now - last) / 1000, 0.05); last = now;
   if (!ready || !visible || document.hidden) return;
-  const t = clock.getElapsedTime();
-  px += (tx - px) * 0.04; py += (ty - py) * 0.04;
+  const t = (now - shownAt) / 1000;
+  const ramp = Math.min(t / 2.5, 1);
+  angle += SPIN * dt * ramp * ramp;
+  stage.rotation.y = angle;
+  if (doors) doors.set(doorState(t - 0.5));
+  px += (tx - px) * 0.05; py += (ty - py) * 0.05;
   const scroll = Math.min(scrollY / innerHeight, 1);
-  const intro = Math.min((performance.now() - shownAt) / 2600, 1);
-  const ease = intro * intro * (3 - 2 * intro);
-  const az = baseAz + Math.sin(t * 0.18) * 0.1 * ease - px * 0.22 - scroll * 0.55;
-  const r = baseR * (small() ? 1 : 1.08) * (1 - 0.03 * ease) * (1 + scroll * 0.08);
-  camera.position.set(F.look.x + Math.cos(az) * r, F.pos.y + py * -0.18 + scroll * 0.5, F.look.z + Math.sin(az) * r);
+  const az = baseAz - px * 0.25 - scroll * 0.35;
+  const r = baseR * (1 + scroll * 0.1);
+  camera.position.set(F.look.x + Math.cos(az) * r, F.pos.y + py * -0.2 + scroll * 0.6, F.look.z + Math.sin(az) * r);
   camera.lookAt(F.look);
   for (const l of lamps) l.emissiveIntensity = 2.6 + Math.sin(t * 1.4) * 0.25;
   renderer.render(scene, camera);
