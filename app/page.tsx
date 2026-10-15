@@ -34,7 +34,7 @@ export default function Home() {
       <main id="conteudo">
         {/* ---------- hero ---------- */}
         <section id="inicio" className="hero" aria-label="Apresentação">
-          <Hero3D alt="Estudo 3D de sala de estar: sofá de veludo ameixa, parede em ripado de madeira e luz da tarde entrando por uma janela do piso ao teto." />
+          <Hero3D alt="Imagem ilustrativa de sala de estar ampla, com sofá claro, poltrona de madeira e janelas para os morros do Rio ao pôr do sol." />
           <div className="hero-shade" />
           <div data-hero-copy className="wrap relative z-10 flex h-full flex-col justify-end pb-[calc(48px+env(safe-area-inset-bottom,0px))] md:pb-16">
             <p className="label fade-up mb-6 opacity-90">Arq. Fernanda Moraes · Neuroarquitetura e Interiores</p>
@@ -52,7 +52,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <p className="absolute bottom-4 right-[var(--gutter)] z-10 hidden text-[11px] tracking-wide text-paper/60 md:block">Maquete 3D interativa · estudo conceitual</p>
+          <p className="absolute bottom-4 right-[var(--gutter)] z-10 hidden text-[11px] tracking-wide text-paper/60 md:block">Maquete 3D e imagem ilustrativa</p>
           <div className="absolute bottom-0 left-1/2 z-10 hidden -translate-x-1/2 md:block"><div className="scroll-cue" /></div>
         </section>
 
@@ -122,44 +122,44 @@ export default function Home() {
         </section>
 
         {/* ---------- studies (portfolio) ---------- */}
-        <section id="estudos" className="wrap py-[clamp(96px,12vw,180px)]" aria-labelledby="estudos-title">
-          <div className="grid gap-8 md:grid-cols-12 md:items-end">
-            <div className="md:col-span-7">
-              <p className="label text-violet" data-reveal>Estudos de ambiente</p>
-              <h2 id="estudos-title" className="display mt-5 text-[clamp(2.4rem,5vw,4.6rem)] leading-[1]" data-reveal data-delay="1">
-                Materiais nobres, <em>luz que entra</em> e cor com intenção.
-              </h2>
+        <section id="estudos" className="hscroll" aria-labelledby="estudos-title" data-hscroll>
+          <div className="hscroll-pin">
+            <div className="wrap hscroll-head">
+              <div>
+                <p className="label text-violet" data-reveal>Estudos de ambiente</p>
+                <h2 id="estudos-title" className="display mt-4 text-[clamp(2.2rem,4.4vw,4.2rem)] leading-[1]" data-reveal data-delay="1">
+                  Materiais nobres, <em>luz que entra</em> e cor com intenção.
+                </h2>
+              </div>
+              <p className="max-w-[44ch] text-[13.5px] leading-relaxed text-mute" data-reveal data-delay="2">
+                Imagens ilustrativas e estudos em 3D feitos para esta prévia. Não são projetos executados pela FM Arquitetura; na versão final, esta galeria recebe as obras reais do escritório.
+              </p>
             </div>
-            <p className="max-w-[46ch] text-[14.5px] leading-relaxed text-mute md:col-span-5" data-reveal data-delay="2">
-              As imagens desta prévia são estudos conceituais criados em 3D para ilustrar a proposta visual. Não são projetos executados pela FM Arquitetura. Na versão final, esta galeria recebe os projetos reais do escritório.
-            </p>
-          </div>
-
-          <div className="mt-16 grid gap-x-6 gap-y-16 md:mt-24 md:grid-cols-12 md:gap-y-28">
-            {gallery.map((g, i) => {
-              const layout = [
-                "md:col-span-8",
-                "md:col-span-4 md:col-start-9 md:mt-[38%]",
-                "md:col-span-5 md:col-start-2",
-                "md:col-span-6 md:col-start-7 md:-mt-[10%]",
-              ][i];
-              const ratio = ["aspect-[16/10]", "aspect-[4/5]", "aspect-[4/5]", "aspect-[16/11]"][i];
-              return (
-                <figure key={g.img + i} className={`study m-0 ${layout}`}>
-                  <div className={`pframe ${ratio}`} data-reveal="clip">
-                    <Picture name={g.img} alt={g.alt} sizes={i === 0 ? "(min-width:768px) 66vw, 100vw" : "(min-width:768px) 45vw, 100vw"} parallax />
-                    <span className="sr-only">Estudo conceitual ilustrativo</span>
-                  </div>
-                  <figcaption className="mt-4 flex items-baseline justify-between gap-6 border-b border-line pb-4" data-reveal>
-                    <span>
-                      <span className="display text-[1.45rem]">{g.title}</span>
-                      <span className="mt-1 block max-w-[48ch] text-[14px] text-mute">{g.note}</span>
-                    </span>
-                    <span className="label shrink-0 text-[10px] text-mute">Estudo 3D</span>
-                  </figcaption>
-                </figure>
-              );
-            })}
+            <div className="hscroll-viewport">
+              <ol className="hscroll-track" data-hscroll-track>
+                {gallery.map((g, i) => (
+                  <li key={g.img} className="hcard" style={{ ["--i" as string]: i }}>
+                    <figure className="m-0">
+                      <div className="hcard-media">
+                        <Picture name={g.img} alt={g.alt} sizes="(min-width:1024px) 46vw, 84vw" />
+                      </div>
+                      <figcaption className="mt-4 flex items-baseline justify-between gap-6">
+                        <span>
+                          <span className="label mr-3 text-mute">{String(i + 1).padStart(2, "0")}</span>
+                          <span className="display text-[1.5rem]">{g.title}</span>
+                          <span className="mt-1 block max-w-[46ch] text-[14px] text-mute">{g.note}</span>
+                        </span>
+                        <span className="label shrink-0 text-[10px] text-mute">{g.kind}</span>
+                      </figcaption>
+                    </figure>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div className="wrap hscroll-foot" aria-hidden="true">
+              <span className="label text-mute"><span className="hidden lg:inline">Role para ver os ambientes</span><span className="lg:hidden">Deslize para ver os ambientes</span></span>
+              <span className="hscroll-bar"><i data-hscroll-bar /></span>
+            </div>
           </div>
         </section>
 
@@ -274,7 +274,7 @@ export default function Home() {
               <strong className="font-medium text-paper">Prévia conceitual, não oficial.</strong> Desenvolvida para apresentação de proposta e sujeita à aprovação da FM Arquitetura e Interiores. Os textos usam informações públicas do Instagram e do site oficial (<a className="ulink" href={contact.officialSite} target="_blank" rel="noopener">fmarquiteta.com.br</a>).
             </p>
             <p>
-              Imagens: estudos conceituais renderizados em 3D para esta prévia; não retratam obras ou clientes reais. Retrato da Fernanda e frases citadas: perfil @arq.fernandamoraes no Instagram. Mobiliário 3D: Glam Velvet Sofa, Chair Damask Purplegold e Anisotropy Barn Lamp © Wayfair (CC BY 4.0), Sheen Chair © Wayfair (CC0), Diffuse Transmission Plant © Darmstadt Graphics Group (CC BY 4.0), via Khronos glTF Sample Assets.
+              Imagens: estudos conceituais renderizados em 3D e imagens ilustrativas de ambientes fornecidas para esta prévia; não retratam obras ou clientes reais da FM. Retrato da Fernanda e frases citadas: perfil @arq.fernandamoraes no Instagram. Mobiliário 3D: Glam Velvet Sofa, Chair Damask Purplegold e Anisotropy Barn Lamp © Wayfair (CC BY 4.0), Sheen Chair © Wayfair (CC0), Diffuse Transmission Plant © Darmstadt Graphics Group (CC BY 4.0), via Khronos glTF Sample Assets.
             </p>
           </div>
         </div>

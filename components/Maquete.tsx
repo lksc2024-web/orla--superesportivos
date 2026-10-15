@@ -16,7 +16,7 @@ export default function Maquete() {
   useEffect(() => {
     const sec = section.current!, host = stage.current!;
     const items = [...sec.querySelectorAll<HTMLElement>(".step-item")];
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const progress = () => {
       const r = sec.getBoundingClientRect();
       return Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
@@ -36,7 +36,7 @@ export default function Maquete() {
       if (!en.isIntersecting || started) return;
       started = true; io.disconnect();
       try {
-        dispose = await start(host, progress, reduce);
+        dispose = await start(host, progress, calm);
       } catch {
         /* poster stays */
       }
@@ -87,7 +87,7 @@ export default function Maquete() {
   );
 }
 
-async function start(host: HTMLElement, progress: () => number, reduce: boolean): Promise<() => void> {
+async function start(host: HTMLElement, progress: () => number, calm: boolean): Promise<() => void> {
   const room = await createRoom(host, { background: "#efe8dd" });
   const { renderer, scene, camera, build } = room;
 
@@ -107,13 +107,13 @@ async function start(host: HTMLElement, progress: () => number, reduce: boolean)
     raf = requestAnimationFrame(tick);
     if (!visible || document.hidden) return;
     const t = (performance.now() - t0) / 1000;
-    const p = reduce ? 1 : progress();
+    const p = progress();
     build(p);
     const a = sm(0.12, 0.46, p), b = sm(0.7, 1, p);
     let pos = lerp3(PLAN.pos, ISO.pos, a), look = lerp3(PLAN.look, ISO.look, a);
     pos = lerp3(pos, END.pos, b); look = lerp3(look, END.look, b);
     const k = camera.aspect < 1 ? 1.55 : camera.aspect < 1.35 ? 1.15 : 1;
-    const breathe = reduce ? 0 : Math.sin(t * 0.3) * 0.18 * a;
+    const breathe = calm ? 0 : Math.sin(t * 0.3) * 0.18 * a;
     camera.position.set(look[0] + (pos[0] - look[0]) * k + breathe, look[1] + (pos[1] - look[1]) * k, look[2] + (pos[2] - look[2]) * k);
     camera.lookAt(look[0], look[1], look[2]);
     renderer.render(scene, camera);

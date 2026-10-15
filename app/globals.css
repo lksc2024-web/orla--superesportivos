@@ -82,6 +82,13 @@ img { display: block; max-width: 100%; }
 .hero-media[data-mode="3d"] picture { opacity: 0; }
 .hero-media[data-mode="3d"] { background: #1d1916; }
 .hero-stage { position: absolute; inset: 0; }
+/* the finished space opens over the model like a curtain, right to left */
+.hero-media .hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 1; clip-path: inset(0 0 0 100%); transition: clip-path 1.7s cubic-bezier(.75, 0, .2, 1); }
+.hero-media[data-photo="on"] .hero-photo, .hero-media[data-mode="photo"] .hero-photo { clip-path: inset(0 0 0 0); }
+.hero-replay { position: absolute; z-index: 12; right: var(--gutter); bottom: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; font-size: 12.5px; color: var(--color-paper); background: rgb(29 25 22 / 0.35); box-shadow: inset 0 0 0 1px rgb(245 241 234 / 0.35); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); cursor: pointer; opacity: 0; pointer-events: none; transform: translateY(8px); transition: opacity .6s var(--ease-out-soft), transform .6s var(--ease-out-soft), background-color .3s; }
+.hero-replay[data-show] { opacity: 1; pointer-events: auto; transform: none; }
+.hero-replay:hover { background: rgb(117 0 88 / 0.75); }
+@media (max-width: 767px) { .hero-replay { top: calc(var(--header-h) + 40px); bottom: auto; left: var(--gutter); right: auto; } }
 .hero-media[data-mode="3d"]::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgb(29 25 22 / 0.88) 0%, rgb(29 25 22 / 0.55) 30%, rgb(29 25 22 / 0) 52%); }
 @media (max-width: 767px) { .hero-media[data-mode="3d"]::after { background: linear-gradient(180deg, rgb(29 25 22 / 0) 38%, rgb(29 25 22 / 0.82) 56%, rgb(29 25 22 / 0.95) 100%); } }
 .hero-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.2s var(--ease-out-soft); }
@@ -139,6 +146,34 @@ img { display: block; max-width: 100%; }
 .study .pframe::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 0 var(--color-paper); transition: box-shadow .6s var(--ease-out-soft); pointer-events: none; }
 .study:hover .pframe::after { box-shadow: inset 0 0 0 10px var(--color-paper); }
 
+/* horizontal studies gallery: pinned and driven by vertical scroll on desktop, swipe on phones */
+.hscroll { position: relative; }
+.hscroll-pin { display: flex; flex-direction: column; padding-block: clamp(80px, 10vw, 130px) 40px; }
+.hscroll-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap; }
+.hscroll-viewport { margin-top: 44px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.hscroll-viewport::-webkit-scrollbar { display: none; }
+.hscroll-track { display: flex; gap: 18px; margin: 0; padding: 0 var(--gutter); list-style: none; width: max-content; }
+.hcard { flex: none; width: 84vw; scroll-snap-align: center; }
+.hcard-media { position: relative; overflow: hidden; aspect-ratio: 4 / 3; background: var(--color-sand); }
+.hcard-media img { position: absolute; top: 0; left: -6%; width: 112%; height: 100%; object-fit: cover; will-change: transform; transition: filter .6s; }
+.hcard:hover .hcard-media img { filter: saturate(1.07); }
+.hscroll-foot { display: flex; align-items: center; gap: 18px; margin-top: 28px; }
+.hscroll-bar { position: relative; flex: 1; max-width: 260px; height: 1px; background: var(--color-line); }
+.hscroll-bar i { position: absolute; inset: 0; background: var(--color-plum); transform-origin: left; transform: scaleX(0); }
+@media (min-width: 1024px) {
+  .hscroll-pin { position: sticky; top: 0; height: 100vh; height: 100svh; padding-block: calc(var(--header-h) + 26px) 30px; overflow: hidden; }
+  .hscroll-viewport { flex: 1; min-height: 0; overflow: visible; margin-top: 4vh; scroll-snap-type: none; }
+  .hscroll-track { height: 100%; gap: 3.2vw; padding-left: max(var(--gutter), calc((100vw - 1360px) / 2 + var(--gutter))); padding-right: 12vw; will-change: transform; }
+  .hcard { width: auto; display: flex; flex-direction: column; }
+  .hscroll-head { flex-wrap: nowrap; }
+  .hscroll-head h2 { max-width: 23ch; }
+  .hcard-media { height: clamp(240px, calc(100svh - 470px), 520px); aspect-ratio: 16 / 11; }
+  .hcard:nth-child(even) .hcard-media { aspect-ratio: 4 / 5; }
+  .hcard:nth-child(even) { padding-top: 3.5vh; }
+  .hcard figcaption { max-width: 560px; }
+  .hscroll-foot { display: none; }
+}
+
 /* services */
 .svc { border-top: 1px solid var(--color-line); transition: background-color .5s var(--ease-out-soft); }
 .svc:last-child { border-bottom: 1px solid var(--color-line); }
@@ -173,12 +208,9 @@ img { display: block; max-width: 100%; }
   .study:hover .pframe::after { box-shadow: none; }
 }
 
+/* Many Windows PCs report reduced motion by default ("animation effects" off). The 3D, parallax and
+   reveals are tied to the user's own scroll, so they stay on; only motion that plays by itself is removed. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; transition-delay: 0s !important; }
-  [data-reveal], [data-reveal="clip"] { opacity: 1; transform: none; clip-path: none; }
-  .line-mask > span, .fade-up { transform: none; opacity: 1; }
-  .pframe img { height: 100%; top: 0; transform: none !important; }
-  .manifesto .w { color: var(--color-ink); }
-  .manifesto .w.accent { color: var(--color-plum); font-style: italic; }
+  .scroll-cue::after { animation: none; }
 }

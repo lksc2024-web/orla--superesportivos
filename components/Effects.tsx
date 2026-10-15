@@ -13,7 +13,8 @@ import { useEffect } from "react";
  */
 export default function Effects() {
   useEffect(() => {
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // scroll-linked effects run for everyone; "calm" only drops the lagging follow on the preview
+    const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.documentElement.classList.add("is-ready");
 
     // reveals
@@ -43,6 +44,40 @@ export default function Effects() {
     const heroCopy = document.querySelector<HTMLElement>("[data-hero-copy]");
     const heroMedia = document.querySelector<HTMLElement>("[data-hero-media]");
 
+    // horizontal gallery
+    const hs = document.querySelector<HTMLElement>("[data-hscroll]");
+    const track = hs?.querySelector<HTMLElement>("[data-hscroll-track]") ?? null;
+    const hbar = hs?.querySelector<HTMLElement>("[data-hscroll-bar]") ?? null;
+    const hview = hs?.querySelector<HTMLElement>(".hscroll-viewport") ?? null;
+    const hcards = track ? [...track.querySelectorAll<HTMLElement>(".hcard-media img")] : [];
+    const wide = () => innerWidth >= 1024;
+    const sizeGallery = () => {
+      if (!hs || !track) return;
+      if (wide()) hs.style.height = `${Math.max(innerHeight, track.scrollWidth - innerWidth + innerHeight)}px`;
+      else { hs.style.height = ""; track.style.transform = ""; }
+    };
+    const galleryFrame = () => {
+      if (!hs || !track || !hview) return;
+      let p: number;
+      if (wide()) {
+        const r = hs.getBoundingClientRect();
+        p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
+        track.style.transform = `translate3d(${(-p * Math.max(0, track.scrollWidth - innerWidth)).toFixed(1)}px,0,0)`;
+      } else {
+        p = hview.scrollLeft / Math.max(1, hview.scrollWidth - hview.clientWidth);
+      }
+      if (hbar) hbar.style.transform = `scaleX(${p.toFixed(3)})`;
+      for (const img of hcards) {
+        const r = img.parentElement!.getBoundingClientRect();
+        if (r.right < -50 || r.left > innerWidth + 50) continue;
+        const k = (r.left + r.width / 2 - innerWidth / 2) / (innerWidth / 2 + r.width / 2);
+        img.style.transform = `translate3d(${(-k * 5).toFixed(2)}%,0,0)`;
+      }
+    };
+    sizeGallery();
+    window.addEventListener("load", sizeGallery);
+    hview?.addEventListener("scroll", () => requestAnimationFrame(galleryFrame), { passive: true });
+
     let current = -1;
     const setPillar = (i: number) => {
       if (i === current) return;
@@ -56,7 +91,7 @@ export default function Effects() {
     const update = () => {
       ticking = false;
       const vh = innerHeight;
-      if (!reduce) {
+      {
         for (const el of parallax) {
           const r = el.parentElement!.getBoundingClientRect();
           if (r.bottom < -100 || r.top > vh + 100) continue;
@@ -71,10 +106,11 @@ export default function Effects() {
       }
       if (manifesto && words.length) {
         const r = manifesto.getBoundingClientRect();
-        const p = reduce ? 1 : Math.min(1, Math.max(0, (vh * 0.82 - r.top) / (r.height * 0.9)));
+        const p = Math.min(1, Math.max(0, (vh * 0.82 - r.top) / (r.height * 0.9)));
         const n = Math.round(p * words.length);
         words.forEach((w, i) => w.classList.toggle("on", i < n));
       }
+      galleryFrame();
       if (pillars.length) {
         let pick = 0;
         pillars.forEach((p, i) => { if (p.getBoundingClientRect().top < vh * 0.55) pick = i; });
@@ -83,7 +119,8 @@ export default function Effects() {
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
     addEventListener("scroll", onScroll, { passive: true });
-    addEventListener("resize", onScroll);
+    const onResize = () => { sizeGallery(); onScroll(); };
+    addEventListener("resize", onResize);
     update();
 
     // service preview following the cursor
@@ -103,15 +140,15 @@ export default function Effects() {
       peekImg.src = src;
       pos.x = cur.x = e.clientX; pos.y = cur.y = e.clientY;
       peek.classList.add("on");
-      if (!peekRaf && !reduce) peekRaf = requestAnimationFrame(follow);
+      if (!peekRaf && !calm) peekRaf = requestAnimationFrame(follow);
     };
-    const move = (e: PointerEvent) => { pos.x = e.clientX + 40; pos.y = e.clientY; if (reduce && peek) { peek.style.left = `${pos.x}px`; peek.style.top = `${pos.y}px`; } };
+    const move = (e: PointerEvent) => { pos.x = e.clientX + 40; pos.y = e.clientY; if (calm && peek) { peek.style.left = `${pos.x}px`; peek.style.top = `${pos.y}px`; } };
     const leave = () => { peek?.classList.remove("on"); cancelAnimationFrame(peekRaf); peekRaf = 0; };
     rows.forEach((r) => { r.addEventListener("pointerenter", enter); r.addEventListener("pointermove", move); r.addEventListener("pointerleave", leave); });
 
     return () => {
       io.disconnect();
-      removeEventListener("scroll", onScroll); removeEventListener("resize", onScroll);
+      removeEventListener("scroll", onScroll); removeEventListener("resize", onResize); window.removeEventListener("load", sizeGallery);
       rows.forEach((r) => { r.removeEventListener("pointerenter", enter); r.removeEventListener("pointermove", move); r.removeEventListener("pointerleave", leave); });
       cancelAnimationFrame(peekRaf);
     };
