@@ -7,8 +7,11 @@ import { createRoom, lerp3, sm } from "@/lib/room3d";
 /**
  * Scroll-driven study model of the living room:
  * plan lines → walls rise → furniture arrives in white → materials and colour.
- * three.js is loaded only when the section gets close to the viewport.
+ * three.js, the models and every shader are loaded and prepared well before the section is on screen,
+ * and the model follows the scroll through an eased value, so it keeps gliding instead of stepping.
+ * The build completes at ~80% of the section; the rest is the finished room.
  */
+const BUILD_END = 0.8;
 export default function Maquete() {
   const section = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -23,7 +26,8 @@ export default function Maquete() {
     };
     const syncSteps = () => {
       const p = progress();
-      const i = Math.min(steps.length - 1, Math.floor(p * steps.length * 0.999));
+      const b = Math.min(1, p / BUILD_END);
+      const i = Math.min(steps.length - 1, Math.floor(b * steps.length * 0.999));
       items.forEach((el, k) => el.classList.toggle("on", k === i));
       sec.style.setProperty("--p", p.toFixed(4));
     };
@@ -40,14 +44,14 @@ export default function Maquete() {
       } catch {
         /* poster stays */
       }
-    }, { rootMargin: "800px 0px" });
+    }, { rootMargin: "2000px 0px" });
     io.observe(sec);
 
     return () => { io.disconnect(); removeEventListener("scroll", syncSteps); dispose?.(); };
   }, []);
 
   return (
-    <section ref={section} id="metodo" className="relative" style={{ height: "420vh" }} aria-labelledby="metodo-title">
+    <section ref={section} id="metodo" className="relative" style={{ height: "300vh" }} aria-labelledby="metodo-title">
       <div className="sticky top-0 flex h-[100svh] flex-col overflow-hidden lg:flex-row">
         <div className="relative order-2 flex flex-1 flex-col justify-end px-[var(--gutter)] pb-8 pt-4 lg:order-1 lg:w-[38%] lg:flex-none lg:justify-center lg:py-0 lg:pl-[max(var(--gutter),calc((100vw-1360px)/2+var(--gutter)))] lg:pr-12">
           <p className="label hidden text-violet lg:block">Método</p>
@@ -90,6 +94,9 @@ export default function Maquete() {
 async function start(host: HTMLElement, progress: () => number, calm: boolean): Promise<() => void> {
   const room = await createRoom(host, { background: "#efe8dd" });
   const { renderer, scene, camera, build } = room;
+  // models in, shaders compiled, first frame drawn: all before the visitor gets here
+  await Promise.race([room.ready, new Promise((ok) => setTimeout(ok, 6000))]);
+  room.prepare();
 
   // camera: top-down plan → three-quarter → closer
   const PLAN = { pos: [0.1, 12.5, 0.12], look: [0.1, 0, 0.1] };
@@ -101,13 +108,19 @@ async function start(host: HTMLElement, progress: () => number, calm: boolean): 
   const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0 });
   io.observe(host);
 
-  let shown = false, raf = 0;
-  const t0 = performance.now();
+  let shown = false, raf = 0, eased = progress() / BUILD_END, last = performance.now();
+  const t0 = last;
   const tick = () => {
     raf = requestAnimationFrame(tick);
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
     if (!visible || document.hidden) return;
-    const t = (performance.now() - t0) / 1000;
-    const p = progress();
+    const t = (now - t0) / 1000;
+    // the scroll sets the target; the model eases towards it (about a quarter second behind)
+    const target = Math.min(1, progress() / BUILD_END);
+    eased += (target - eased) * (1 - Math.exp(-dt * 7));
+    if (Math.abs(target - eased) < 0.0005) eased = target;
+    const p = eased;
     build(p);
     const a = sm(0.12, 0.46, p), b = sm(0.7, 1, p);
     let pos = lerp3(PLAN.pos, ISO.pos, a), look = lerp3(PLAN.look, ISO.look, a);

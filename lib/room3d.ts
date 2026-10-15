@@ -10,6 +10,8 @@ export type Room = {
   scene: T.Scene;
   camera: T.PerspectiveCamera;
   build: (p: number) => void;
+  /** compile every shader now (all objects shown once), so nothing stalls when furniture appears later */
+  prepare: () => void;
   ready: Promise<void>;
   resize: () => void;
   dispose: () => void;
@@ -32,12 +34,15 @@ export async function createRoom(host: HTMLElement, opts: { background: string; 
 
   const small = innerWidth < 1024;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, opts.dpr ?? (small ? 1.5 : 1.6)));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, opts.dpr ?? (small ? 1.5 : 1.5)));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = opts.exposure ?? 1.0;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // shadows are only re-rendered when the model changes (see build), not on every camera frame
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
   host.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -53,7 +58,7 @@ export async function createRoom(host: HTMLElement, opts: { background: string; 
   sun.position.set(-8, 5.5, -2.5);
   sun.target.position.set(0.5, 0, -0.6);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048);
+  sun.shadow.mapSize.set(small ? 1024 : 1536, small ? 1024 : 1536);
   const sc = sun.shadow.camera;
   sc.left = -6; sc.right = 6; sc.top = 6; sc.bottom = -6; sc.near = 1; sc.far = 25;
   sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.02; sun.shadow.radius = 4;
@@ -179,11 +184,15 @@ export async function createRoom(host: HTMLElement, opts: { background: string; 
 
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 80);
 
+  let lastP = -1;
   const build = (p: number) => {
+    if (Math.abs(p - lastP) < 0.0004) return;
+    lastP = p;
+    renderer.shadowMap.needsUpdate = true;
     const rise = sm(0.16, 0.42, p), drop = sm(0.44, 0.72, p), mat = sm(0.74, 0.95, p);
     walls.scale.y = 0.012 + rise * 0.988;
     wallMat.color.copy(INK).lerp(PLASTER, sm(0.18, 0.36, p));
-    slats.visible = rise > 0.6;
+    slats.visible = rise > 0.02;
     cove.visible = mat > 0.3;
     for (const f of furniture) {
       const k = sm(f.delay * 0.6, f.delay * 0.6 + 0.4, drop);
@@ -198,6 +207,14 @@ export async function createRoom(host: HTMLElement, opts: { background: string; 
   };
   build(0);
 
+  const prepare = () => {
+    const hidden: T.Object3D[] = [];
+    scene.traverse((o) => { if (!o.visible) { hidden.push(o); o.visible = true; } });
+    renderer.compile(scene, camera);
+    hidden.forEach((o) => { o.visible = false; });
+    renderer.shadowMap.needsUpdate = true;
+  };
+
   const resize = () => {
     const w = host.clientWidth, h = host.clientHeight;
     renderer.setSize(w, h, false);
@@ -206,5 +223,5 @@ export async function createRoom(host: HTMLElement, opts: { background: string; 
   resize();
 
   const dispose = () => { renderer.dispose(); renderer.domElement.remove(); };
-  return { THREE, renderer, scene, camera, build, ready, resize, dispose };
+  return { THREE, renderer, scene, camera, build, prepare, ready, resize, dispose };
 }

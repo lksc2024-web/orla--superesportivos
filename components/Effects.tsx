@@ -101,7 +101,10 @@ export default function Effects() {
         if (heroCopy && heroMedia) {
           const h = heroMedia.clientHeight, y = Math.min(scrollY, h);
           heroCopy.style.transform = `translate3d(0, ${(y * 0.35).toFixed(1)}px, 0)`;
-          heroCopy.style.opacity = String(1 - Math.min(1, y / (h * 0.65)));
+          const o = 1 - Math.min(1, y / (h * 0.6));
+          heroCopy.style.opacity = String(o);
+          // the reading gradient leaves with the text so the panorama is seen clean
+          heroMedia.style.setProperty("--shade", (0.2 + 0.8 * o).toFixed(3));
         }
       }
       if (manifesto && words.length) {

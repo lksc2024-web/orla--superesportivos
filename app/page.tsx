@@ -1,6 +1,6 @@
 import Effects from "@/components/Effects";
 import Header from "@/components/Header";
-import Hero3D from "@/components/Hero3D";
+import HeroPanorama from "@/components/HeroPanorama";
 import Maquete from "@/components/Maquete";
 import Picture from "@/components/Picture";
 import { contact, fields, gallery, largest, pillars, services, whatsappHref } from "@/lib/site";
@@ -33,8 +33,9 @@ export default function Home() {
       <Effects />
       <main id="conteudo">
         {/* ---------- hero ---------- */}
-        <section id="inicio" className="hero" aria-label="Apresentação">
-          <Hero3D alt="Imagem ilustrativa de sala de estar ampla, com sofá claro, poltrona de madeira e janelas para os morros do Rio ao pôr do sol." />
+        <section id="inicio" className="hero-wrap" aria-label="Apresentação" data-hero-wrap>
+          <div className="hero">
+          <HeroPanorama alt="Imagem ilustrativa de sala de estar ampla, com sofá claro, poltrona de madeira e janelas para os morros do Rio ao pôr do sol." />
           <div className="hero-shade" />
           <div data-hero-copy className="wrap relative z-10 flex h-full flex-col justify-end pb-[calc(48px+env(safe-area-inset-bottom,0px))] md:pb-16">
             <p className="label fade-up mb-6 opacity-90">Arq. Fernanda Moraes · Neuroarquitetura e Interiores</p>
@@ -52,8 +53,12 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <p className="absolute bottom-4 right-[var(--gutter)] z-10 hidden text-[11px] tracking-wide text-paper/60 md:block">Maquete 3D e imagem ilustrativa</p>
-          <div className="absolute bottom-0 left-1/2 z-10 hidden -translate-x-1/2 md:block"><div className="scroll-cue" /></div>
+          <p className="absolute bottom-4 right-[var(--gutter)] z-10 hidden text-[11px] tracking-wide text-paper/60 md:block">Imagem ilustrativa</p>
+          <div className="hero-cue absolute bottom-0 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex">
+            <span className="label text-[10px] text-paper/70">Role para percorrer a sala</span>
+            <div className="scroll-cue" />
+          </div>
+          </div>
         </section>
 
         {/* ---------- manifesto ---------- */}
