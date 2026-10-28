@@ -165,7 +165,7 @@ if (renderer) {
     const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.12, 0.05, 40), chrome); collar.position.y = BH + 0.025; g.add(collar);
     const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.11, 32), chrome); stem.position.y = BH + 0.1; g.add(stem);
     const head = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.09, 32), new THREE.MeshPhysicalMaterial({ color: "#111317", metalness: 0.4, roughness: 0.2, clearcoat: 1 })); head.position.y = BH + 0.2; g.add(head);
-    const tip = new THREE.Vector3(-0.07, BH + 0.205, 0.04);
+    const tip = new THREE.Vector3(0.07, BH + 0.205, 0.04);
     // cap: the photo of the ribbed cap wrapped around a turned profile with a domed top
     const prof = [];
     for (let i = 0; i <= 40; i++) {
@@ -186,7 +186,7 @@ if (renderer) {
     function emit(count, o, d) {
       for (let k = 0; k < count; k++) {
         const i = headI; headI = (headI + 1) % N;
-        const s = 0.4, v = new THREE.Vector3(d.x + (Math.random() - 0.5) * s, d.y + (Math.random() - 0.5) * s, d.z + (Math.random() - 0.5) * s).normalize().multiplyScalar(1.6 + Math.random() * 2.2);
+        const s = 0.4, v = new THREE.Vector3(d.x + (Math.random() - 0.5) * s, d.y + (Math.random() - 0.5) * s, d.z + (Math.random() - 0.5) * s).normalize().multiplyScalar(1.1 + Math.random() * 1.5);
         P.pos.set([o.x, o.y, o.z], i * 3); P.vel.set([v.x, v.y, v.z], i * 3);
         P.age[i] = 0; P.life[i] = 1.2 + Math.random() * 1.5; P.size[i] = Math.random() < 0.06 ? 0.012 : 0.03 + Math.random() * 0.05;
       }
@@ -200,7 +200,7 @@ if (renderer) {
     let clockS = 0.9, pulse = 0, eased = 0;
     return {
       scene,
-      frame: { wide: { look: [0, 0.98, 0], h: 2.85, fov: 24, sx: 0.67, sy: 0.5 }, tall: { look: [0, 0.98, 0], h: 4.4, fov: 30, sx: 0.5, sy: 0.63 } },
+      frame: { wide: { look: [0, 0.98, 0], h: 3.5, fov: 24, sx: 0.68, sy: 0.46 }, tall: { look: [0, 0.98, 0], h: 5.8, fov: 30, sx: 0.5, sy: 0.62 } },
       ready: () => ok(bgWide, bgTall, bodyTex, capTex),
       update(p, t, dt) {
         eased += (p - eased) * (1 - Math.exp(-dt * 6)); const e = eased;
@@ -211,10 +211,10 @@ if (renderer) {
         const up = smooth(0.38, 0.47, e) * (1 - smooth(0.88, 0.97, e));
         const aside = smooth(0.45, 0.56, e) * (1 - smooth(0.84, 0.93, e));
         const spray = smooth(0.58, 0.62, e) * (1 - smooth(0.8, 0.84, e));
-        g.rotation.y = turn + Math.sin(t * 0.45) * 0.06 + aside * 0.32 - spray * 0.28;
-        g.rotation.z = -0.04 * spray;
-        const rest = m ? new THREE.Vector3(-0.85, 0, 0.75) : new THREE.Vector3(-1.25, 0, 0.5);
-        cap.position.set(rest.x * aside, (capRest.y + up * 0.38) * (1 - aside) + CR * aside + Math.sin(aside * Math.PI) * 0.45, rest.z * aside);
+        g.rotation.y = turn + Math.sin(t * 0.45) * 0.06 - aside * 0.12 + spray * 0.22;
+        g.rotation.z = 0.03 * spray;
+        const rest = m ? new THREE.Vector3(-0.72, 0, 0.55) : new THREE.Vector3(-1.05, 0, 0.45);
+        cap.position.set(rest.x * aside, (capRest.y + up * 0.3) * (1 - aside) + CR * aside + Math.sin(aside * Math.PI) * 0.3, rest.z * aside);
         cap.rotation.set(0, g.rotation.y + up * Math.PI * 2 + aside * 0.6, aside * Math.PI / 2);
         capSh.position.set(cap.position.x, 0.003, cap.position.z); capSh.material.opacity = aside;
         sh.material.opacity = 0.9;
@@ -223,14 +223,14 @@ if (renderer) {
         pulse = Math.max(0, pulse - dt * 3.2);
         g.updateMatrixWorld(true);
         tipW.copy(tip).applyMatrix4(g.matrixWorld);
-        dirW.set(-0.7, 0.35, 0.62).normalize();
+        dirW.set(m ? 0.62 : 0.7, 0.16, m ? 0.78 : 0.7).normalize();
         if (spray > 0.01) emit(Math.floor((36 * spray + 200 * pulse) * dt * 10), tipW, dirW);
         const pos = sp.geometry.attributes.position.array, sz = sp.geometry.attributes.aSize.array, al = sp.geometry.attributes.aAlpha.array;
         for (let i = 0; i < N; i++) {
           if (P.age[i] > P.life[i]) { al[i] = 0; continue; }
           P.age[i] += dt;
-          const k = i * 3, drag = Math.exp(-dt * 1.7);
-          P.vel[k] *= drag; P.vel[k + 1] = P.vel[k + 1] * drag + 0.16 * dt; P.vel[k + 2] *= drag;
+          const k = i * 3, drag = Math.exp(-dt * 2.4);
+          P.vel[k] *= drag; P.vel[k + 1] = P.vel[k + 1] * drag + 0.08 * dt; P.vel[k + 2] *= drag;
           P.pos[k] += P.vel[k] * dt; P.pos[k + 1] += P.vel[k + 1] * dt; P.pos[k + 2] += P.vel[k + 2] * dt;
           pos[k] = P.pos[k]; pos[k + 1] = P.pos[k + 1]; pos[k + 2] = P.pos[k + 2];
           const a = P.age[i] / P.life[i];
@@ -266,7 +266,7 @@ if (renderer) {
     let eased = 0;
     return {
       scene,
-      frame: { wide: { look: [0, 0.62, 0], h: 2.6, fov: 26, sx: 0.66, sy: 0.48 }, tall: { look: [0, 0.62, 0], h: 5.4, fov: 30, sx: 0.5, sy: 0.6 } },
+      frame: { wide: { look: [0, 0.62, 0], h: 3.3, fov: 26, sx: 0.66, sy: 0.48 }, tall: { look: [0, 0.62, 0], h: 6.4, fov: 30, sx: 0.5, sy: 0.62 } },
       ready: () => items.every((it) => ok(it.img, it.dep, it.bg)),
       update(p, t, dt) {
         items.forEach(build);
