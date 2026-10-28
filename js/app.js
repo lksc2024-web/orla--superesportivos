@@ -287,8 +287,11 @@
         const x = (-px * 34 * o.d + Math.sin(t * 0.5 + o.seed) * 3) * amp;
         const y = ((0.5 - p) * 140 * (o.d - 0.9) + -py * 22 * o.d + Math.cos(t * 0.45 + o.seed) * 4 + (1 - enter) * 90 * o.d) * amp;
         const rot = (px * 4 * o.d + Math.sin(t * 0.3 + o.seed) * 0.8) * amp + (o.grp === "a" ? sw : 0);
+        // pieces turn in depth: the main necklace makes a full turn with the scroll, the others sway
+        const ry = o.grp === "a" ? p * 360 + Math.sin(t * 0.6) * 6 : (Math.sin(t * 0.55 + o.seed) * 22 + (p - 0.5) * 40 * o.d) * amp;
         const sc = o.grp === "a" ? 1 - 0.05 * focus : 1 + 0.08 * focus;
-        o.f.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+        o.f.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) perspective(900px) rotateY(${ry.toFixed(2)}deg) rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+        o.f.style.filter = `brightness(${(0.82 + 0.18 * Math.abs(Math.cos(ry * Math.PI / 180))).toFixed(3)})`;
         o.f.style.setProperty("--g", (sweep - o.d * 18).toFixed(1));
       }
       stageEl.style.setProperty("--lx", (px * 18).toFixed(2));
