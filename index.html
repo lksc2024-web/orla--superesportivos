@@ -31,6 +31,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+html { overflow-x: clip; }
 body { margin: 0; background: var(--oud); color: var(--cream); font: 400 16px/1.6 var(--f-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 img { display: block; max-width: 100%; }
 button { font: inherit; color: inherit; }
@@ -112,7 +113,8 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 400; margin: 0; letter-
 .grid-perf .card.wide .note { font-size: 1rem; margin-top: 8px; }
 .grid-perf .card.wide .add { grid-column: 2; align-self: start; padding: 14px 22px; }
 /* shoes: one row per category, featured shoe wide plus the variations */
-.shoe-rows { display: grid; gap: 54px; }
+.shoe-rows { display: grid; grid-template-columns: minmax(0, 1fr); gap: 54px; }
+.shoe-rows > div { min-width: 0; }
 .shoe-row-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; scroll-margin-top: 90px; }
 .shoe-row-head h3 { font: 400 1.9rem/1 var(--f-display); }
 .shoe-row-head span { color: var(--ink-soft); font-style: italic; }
