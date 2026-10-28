@@ -10,12 +10,50 @@
     { id: "tenis-midnight", cat: "shoe", name: "Runner Oceano", note: "Malha respirável, solado macio", price: 299, tag: "Destaque", opts: ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43"] },
     { id: "tenis-beach", cat: "shoe", name: "Runner Rosé", note: "Malha respirável, solado macio", price: 299, opts: ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43"] },
     { id: "tenis-street", cat: "shoe", name: "Runner Preto", note: "Malha respirável, solado macio", price: 299, opts: ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43"] },
-    // jewellery: real stock photos cut out from the packaging (native pixels, w/h = file size); price on request
-    { id: "pulseira-elos-dourada", cat: "jewel", real: [194, 255], name: "Pulseira de elos dourados", note: "Elos longos com esferas, banho dourado", price: null, tag: "Destaque", opts: ["Única"] },
-    { id: "anel-dourado-texturizado", cat: "jewel", real: [110, 116], name: "Anel texturizado", note: "Aro aberto com relevo, dourado", price: null, opts: ["Único"] },
-    { id: "ear-cuffs-dourados", cat: "jewel", real: [81, 283], name: "Kit de ear cuffs", note: "Seis peças douradas, encaixe na orelha", price: null, opts: ["Kit"] },
-    { id: "anel-dourado-largo", cat: "jewel", real: [113, 110], name: "Anel aro duplo", note: "Aro aberto em duas linhas, dourado", price: null, opts: ["Único"] },
-    { id: "anel-dourado-fino", cat: "jewel", real: [107, 103], name: "Anel aro fino", note: "Linhas finas paralelas, dourado", price: null, opts: ["Único"] },
+    // jewellery: cut out of the store's own photo (native pixels; real = file width/height); price on request
+    {"id": "relogio-cravejado", "cat": "jewel", "sub": "relogio", "real": [129, 256], "name": "Relógio prata cravejado", "note": "Pulseira de aço, mostrador branco, aro com strass", "price": null, "opts": ["Única"]},
+    {"id": "relogio-quadrado-preto", "cat": "jewel", "sub": "relogio", "real": [109, 184], "name": "Relógio quadrado mostrador preto", "note": "Caixa quadrada, mostrador preto, pulseira de aço", "price": null, "opts": ["Única"]},
+    {"id": "colar-torcido-prata", "cat": "jewel", "sub": "colar", "real": [193, 246], "name": "Colar corrente torcida", "note": "Três voltas de corrente torcida, fecho retangular", "price": null, "opts": ["Única"]},
+    {"id": "colar-pingente-cristal", "cat": "jewel", "sub": "colar", "real": [107, 297], "name": "Colar elos com pingente de cristal", "note": "Elos alongados, pingente redondo de cristal", "price": null, "opts": ["Única"]},
+    {"id": "colar-medalhas-douradas", "cat": "jewel", "sub": "colar", "real": [128, 339], "name": "Colar de medalhas douradas", "note": "Duas voltas com medalhas e flor cravejada", "price": null, "opts": ["Única"]},
+    {"id": "colar-elos-dourado-duplo", "cat": "jewel", "sub": "colar", "real": [191, 352], "name": "Colar duplo de elos dourados", "note": "Duas voltas de elos largos, banho dourado", "price": null, "tag": "Destaque", "opts": ["Única"]},
+    {"id": "corrente-coracao", "cat": "jewel", "sub": "colar", "real": [144, 306], "name": "Corrente com coração", "note": "Corrente fina com pingente de coração", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-coracoes", "cat": "jewel", "sub": "pulseira", "real": [120, 297], "name": "Pulseira com corações", "note": "Elos com pingentes de coração e esfera", "price": null, "opts": ["Única"]},
+    {"id": "corrente-flores", "cat": "jewel", "sub": "colar", "real": [124, 307], "name": "Corrente dupla com flores", "note": "Duas correntes finas com flores", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-grumet", "cat": "jewel", "sub": "pulseira", "real": [60, 309], "name": "Pulseira grumet prata", "note": "Elos grumet largos, prata", "price": null, "opts": ["Única"]},
+    {"id": "corrente-coracao-vazado", "cat": "jewel", "sub": "colar", "real": [72, 276], "name": "Corrente com coração vazado", "note": "Corrente fina, coração vazado", "price": null, "opts": ["Única"]},
+    {"id": "corrente-esferas", "cat": "jewel", "sub": "colar", "real": [86, 282], "name": "Corrente gravata com esferas", "note": "Modelo gravata com esferas", "price": null, "opts": ["Única"]},
+    {"id": "corrente-trevo-dourada", "cat": "jewel", "sub": "colar", "real": [90, 265], "name": "Corrente dourada com trevo", "note": "Corrente dourada com trevo de cristal", "price": null, "opts": ["Única"]},
+    {"id": "corrente-coracao-dourado", "cat": "jewel", "sub": "colar", "real": [116, 284], "name": "Corrente com coração dourado", "note": "Corrente prata com coração dourado", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-elos-argola", "cat": "jewel", "sub": "pulseira", "real": [129, 187], "name": "Pulseira de elos com argola", "note": "Elos mistos com argola cravejada", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-tubos", "cat": "jewel", "sub": "pulseira", "real": [141, 209], "name": "Pulseira de tubos com pingente", "note": "Tubos prata com pingente de cristal", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-cravejada", "cat": "jewel", "sub": "pulseira", "real": [205, 164], "name": "Pulseira cravejada", "note": "Corrente com trecho cravejado", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-elos-dupla", "cat": "jewel", "sub": "pulseira", "real": [195, 201], "name": "Pulseira dupla de elos", "note": "Duas voltas de elos", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-argola-prata", "cat": "jewel", "sub": "pulseira", "real": [184, 162], "name": "Pulseira de elos com aro", "note": "Elos com aro central cravejado", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-elos-prata", "cat": "jewel", "sub": "pulseira", "real": [135, 134], "name": "Pulseira de elos prata", "note": "Elos retangulares, prata", "price": null, "opts": ["Única"]},
+    {"id": "pulseira-elos-dourada", "cat": "jewel", "sub": "pulseira", "real": [227, 149], "name": "Pulseira de elos dourada", "note": "Elos retangulares, banho dourado", "price": null, "opts": ["Única"]},
+    {"id": "bracelete-prata", "cat": "jewel", "sub": "pulseira", "real": [217, 186], "name": "Bracelete prata", "note": "Bracelete aberto com elos", "price": null, "opts": ["Única"]},
+    {"id": "bracelete-dourado", "cat": "jewel", "sub": "pulseira", "real": [196, 181], "name": "Bracelete dourado", "note": "Bracelete rígido, banho dourado", "price": null, "tag": "Destaque", "opts": ["Única"]},
+    {"id": "aneis-dourados", "cat": "jewel", "sub": "anel", "real": [134, 88], "name": "Dupla de anéis dourados", "note": "Par de anéis dourados", "price": null, "opts": ["Único"]},
+    {"id": "anel-elos-prata", "cat": "jewel", "sub": "anel", "real": [117, 88], "name": "Anel de elos prata", "note": "Anel de elos entrelaçados", "price": null, "opts": ["Único"]},
+    {"id": "anel-aro-dourado", "cat": "jewel", "sub": "anel", "real": [110, 104], "name": "Anel aro duplo dourado", "note": "Aro aberto em duas linhas, dourado", "price": null, "opts": ["Único"]},
+    {"id": "brinco-trevo-preto", "cat": "jewel", "sub": "brinco", "real": [130, 122], "name": "Brinco trevo preto", "note": "Trevo duplo preto contornado de strass", "price": null, "tag": "Destaque", "opts": ["Par"]},
+    {"id": "brinco-perola-gancho", "cat": "jewel", "sub": "brinco", "real": [117, 142], "name": "Brinco de pérola com gancho", "note": "Pérola com gancho dourado", "price": null, "opts": ["Par"]},
+    {"id": "brinco-perolas-longo", "cat": "jewel", "sub": "brinco", "real": [104, 212], "name": "Brinco longo de pérolas", "note": "Pérolas e cristais em queda", "price": null, "opts": ["Par"]},
+    {"id": "kit-pontos-de-luz", "cat": "jewel", "sub": "brinco", "real": [153, 173], "name": "Kit de brincos ponto de luz", "note": "Pares de ponto de luz, cristal e ametista", "price": null, "opts": ["Kit"]},
+    {"id": "argolas-prata", "cat": "jewel", "sub": "brinco", "real": [114, 66], "name": "Argolas prata", "note": "Argolas pequenas, prata", "price": null, "opts": ["Par"]},
+    {"id": "argolas-cravejadas", "cat": "jewel", "sub": "brinco", "real": [152, 76], "name": "Argolas cravejadas", "note": "Argolas com cristais", "price": null, "opts": ["Par"]},
+    {"id": "brinco-folha-prata", "cat": "jewel", "sub": "brinco", "real": [119, 149], "name": "Brinco folha prata", "note": "Folha prata polida", "price": null, "opts": ["Par"]},
+    {"id": "brinco-gota-prata", "cat": "jewel", "sub": "brinco", "real": [102, 134], "name": "Brinco gota prata", "note": "Gota alongada, prata", "price": null, "opts": ["Par"]},
+    {"id": "argolas-ovais", "cat": "jewel", "sub": "brinco", "real": [130, 134], "name": "Argolas ovais com pedra", "note": "Argolas ovais com pedra", "price": null, "opts": ["Par"]},
+    {"id": "brinco-folhas-vazadas", "cat": "jewel", "sub": "brinco", "real": [94, 121], "name": "Brinco de folhas vazadas", "note": "Folhas vazadas em cascata", "price": null, "opts": ["Par"]},
+    {"id": "brinco-folhas-cristal", "cat": "jewel", "sub": "brinco", "real": [85, 100], "name": "Brinco de folhas cristal", "note": "Folhas de cristal", "price": null, "opts": ["Par"]},
+    {"id": "brinco-retangular-prata", "cat": "jewel", "sub": "brinco", "real": [90, 94], "name": "Brinco retangular prata", "note": "Retangular com esfera, prata", "price": null, "opts": ["Par"]},
+    {"id": "brinco-flor", "cat": "jewel", "sub": "brinco", "real": [42, 86], "name": "Brincos de flor", "note": "Flores pequenas, prata", "price": null, "opts": ["Par"]},
+    {"id": "brinco-pedra-da-lua", "cat": "jewel", "sub": "brinco", "real": [102, 56], "name": "Brinco pedra da lua", "note": "Pedra leitosa com borda dourada", "price": null, "opts": ["Par"]},
+    {"id": "brinco-triangulo-cristal", "cat": "jewel", "sub": "brinco", "real": [80, 51], "name": "Brinco triângulo cristal", "note": "Cristal triangular, base dourada", "price": null, "opts": ["Par"]},
+    {"id": "kit-cristais", "cat": "jewel", "sub": "brinco", "real": [111, 136], "name": "Kit de brincos de cristal", "note": "Pontos de luz de cristal", "price": null, "opts": ["Kit"]},
+    {"id": "kit-ametista", "cat": "jewel", "sub": "brinco", "real": [114, 134], "name": "Kit de brincos ametista", "note": "Pontos de luz cor ametista", "price": null, "opts": ["Kit"]},
   ];
   const CAT = { perfume: "Perfume árabe", shoe: "Tênis", jewel: "Bijuteria" };
   const OPT_LABEL = { perfume: "Volume", shoe: "Numeração", jewel: "Tamanho" };
@@ -30,6 +68,7 @@
     for (const p of PRODUCTS.filter((x) => x.cat === grid.dataset.cat)) {
       const el = document.createElement("article");
       el.className = "card";
+      if (p.sub) el.dataset.sub = p.sub;
       el.innerHTML = `
         <button class="card-media" type="button" data-qv="${p.id}" aria-label="Ver ${p.name}">
           ${p.real
@@ -41,6 +80,14 @@
         <button class="add" type="button" data-qv="${p.id}">${p.opts.length > 1 ? "Escolher" : "Adicionar"}</button>`;
       grid.appendChild(el);
     }
+  }
+
+  // jewellery filter
+  for (const b of $$(".cats button")) {
+    b.addEventListener("click", () => {
+      $$(".cats button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      for (const c of $$(".grid-bijus .card")) c.hidden = !!b.dataset.sub && c.dataset.sub !== b.dataset.sub;
+    });
   }
 
   // bag
@@ -149,7 +196,7 @@
   function headerState() {
     const y = 34;
     const over = [...shelves, ...stages, $(".foot")].find((s) => { const r = s.getBoundingClientRect(); return r.top <= y && r.bottom > y; });
-    const light = over && (over.classList.contains("shelf") || over.classList.contains("stage-light"));
+    const light = over && over.classList.contains("shelf") && !over.classList.contains("shelf-dark");
     top.classList.toggle("light", !!light);
     top.classList.toggle("solid", !light && scrollY > 30);
     const sec = over ? (over.id || "").replace("loja-", "") : "";
