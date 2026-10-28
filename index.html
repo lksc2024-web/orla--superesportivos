@@ -120,8 +120,8 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
 .hint { font: 400 12px/1.5 var(--f-mono); color: var(--ink-soft); }
 
 /* cart drawer */
-.drawer { position: fixed; z-index: 50; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); background: var(--paper); color: var(--ink); transform: translateX(105%); transition: transform .45s cubic-bezier(.2, .7, .1, 1); display: flex; flex-direction: column; box-shadow: -20px 0 60px rgba(0, 0, 0, .25); padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.drawer.open { transform: none; }
+.drawer { position: fixed; z-index: 50; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); background: var(--paper); color: var(--ink); transform: translateX(105%); transition: transform .45s cubic-bezier(.2, .7, .1, 1); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.drawer.open { transform: none; box-shadow: -20px 0 60px rgba(0, 0, 0, .25); }
 .scrim { position: fixed; inset: 0; z-index: 49; background: rgba(18, 13, 10, .5); opacity: 0; pointer-events: none; transition: opacity .3s; }
 .scrim.open { opacity: 1; pointer-events: auto; }
 .drawer header { display: flex; justify-content: space-between; align-items: center; padding: 20px 22px; border-bottom: 1px solid var(--line); }
@@ -144,6 +144,40 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
 .foot .wrap { display: grid; gap: 18px; }
 .foot p { margin: 0; font: 400 12px/1.7 var(--f-mono); max-width: 90ch; }
 .foot a { color: var(--gold); }
+
+/* jewellery vitrine: real product photos, layered for parallax */
+.jstage { background: radial-gradient(120% 90% at 68% 46%, #f8f3ec 0%, #efe7db 46%, #ddd2c2 100%); color: var(--ink); }
+.jlight { position: absolute; inset: -20%; pointer-events: none; background: radial-gradient(34% 30% at calc(50% + var(--lx, 0) * 1%) calc(46% + var(--ly, 0) * 1%), rgba(255, 252, 244, .9), rgba(255, 252, 244, 0) 70%); mix-blend-mode: soft-light; }
+.jscene { position: absolute; top: 80px; bottom: 70px; left: 44%; right: 3%; }
+.jarch { position: absolute; left: 50%; top: 2%; bottom: 0; width: min(78%, 560px); transform: translateX(-50%); border: 1px solid rgba(156, 118, 51, .28); border-bottom: 0; border-radius: 999px 999px 0 0; }
+.jarch::after { content: ""; position: absolute; left: -12%; right: -12%; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(156, 118, 51, .35), transparent); }
+.jrig { position: absolute; inset: 0; --k: 1.25; }
+.jp { position: absolute; left: var(--x); top: var(--y); --mx: var(--x); --my: var(--y); margin: 0; display: grid; justify-items: center; gap: 12px; transform: translate(-50%, -50%); will-change: transform; }
+.jp img { width: calc(var(--w) * var(--k)); height: auto; max-width: none; filter: drop-shadow(0 calc(10px * var(--d, 1)) calc(12px * var(--d, 1)) rgba(70, 45, 20, .2)) drop-shadow(0 2px 2px rgba(70, 45, 20, .22)); }
+.jp figcaption { font: 500 9.5px/1 var(--f-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); white-space: nowrap; opacity: .85; }
+.jp::after { content: ""; position: absolute; left: 50%; top: 0; margin-left: calc(var(--w) * var(--k) / -2); height: calc(var(--h) * var(--k)); width: calc(var(--w) * var(--k)); pointer-events: none; -webkit-mask: var(--src) center / 100% 100% no-repeat; mask: var(--src) center / 100% 100% no-repeat; background: linear-gradient(105deg, transparent 38%, rgba(255, 246, 220, .75) 50%, transparent 62%) calc(var(--g, 0) * 1%) 0 / 320% 100% no-repeat; mix-blend-mode: soft-light; }
+.stage-light .step .eyebrow { color: var(--gold-deep); }
+.stage-light .step p { color: var(--ink-soft); }
+.stage-light .step .cta { background: var(--ink); color: var(--paper); }
+.stage-light .meter { color: rgba(27, 21, 17, .55); }
+.stage-light .meter .bar { background: var(--line); }
+.stage-light .meter .bar i { background: var(--gold-deep); }
+@media (max-width: 1100px) { .jscene { left: 40%; } .jrig { --k: 1.1; } }
+@media (max-width: 760px) {
+  .jscene { top: 66px; bottom: auto; height: 50%; left: 2%; right: 2%; }
+  .jp { left: var(--mx); top: var(--my); }
+  .jrig { --k: .82; }
+  .jarch { width: 74%; }
+  .jp figcaption { display: none; }
+  .stage-light .step { background: linear-gradient(to top, rgba(236, 228, 216, .94) 0, rgba(236, 228, 216, .85) 30%, rgba(236, 228, 216, 0) 42%); }
+}
+/* product cards for real jewellery photos: the piece at its own size, never stretched */
+.grid-bijus .card-media { display: grid; place-items: center; background: radial-gradient(90% 80% at 50% 42%, #f8f4ee, #ebe3d7); }
+.grid-bijus .card-media img { width: calc(var(--w) * 1.25); height: auto; max-width: 78%; max-height: 78%; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(70, 45, 20, .18)) drop-shadow(0 2px 2px rgba(70, 45, 20, .2)); }
+.grid-bijus .card-media:hover img { transform: translateY(-4px); }
+.price.ask { font-family: var(--f-mono); font-size: .82rem; color: var(--ink-soft); letter-spacing: .04em; }
+.line img.real { object-fit: scale-down; padding: 6px; background: #f3ede4; }
+.qv img.real { object-fit: none; background: radial-gradient(90% 80% at 50% 42%, #f8f4ee, #ebe3d7); }
 
 @media (max-width: 900px) {
   .grid { grid-template-columns: repeat(2, 1fr); }
@@ -257,14 +291,29 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
   </section>
 
   <!-- 3. jewellery -->
-  <section class="stage" id="bijus" data-stage="jewel" style="height: 260vh">
-    <div class="pin">
-      <div class="poster" style="--pd: url(/img/stage-jewel.webp); --pm: url(/img/stage-jewel-m.webp)"></div>
+  <section class="stage stage-light" id="bijus" data-stage="jewel" style="height: 300vh">
+    <div class="pin jstage" id="jstage">
+      <div class="jlight" aria-hidden="true"></div>
+      <div class="jscene" aria-hidden="true">
+        <div class="jarch"></div>
+        <div class="jrig" id="jrig">
+          <figure class="jp" data-depth="0.55" data-grp="b" style="--x:21%; --y:22%; --mx:17%; --my:14%"><img src="/img/bijus/anel-dourado-largo.webp" alt="" width="113" height="110"><figcaption>Anel aro duplo</figcaption></figure>
+          <figure class="jp jp-main" data-depth="1" data-grp="a" style="--x:49%; --y:47%; --mx:48%; --my:46%"><img src="/img/bijus/pulseira-elos-dourada.webp" alt="" width="194" height="255"><figcaption>Pulseira de elos</figcaption></figure>
+          <figure class="jp" data-depth="1.25" data-grp="b" style="--x:82%; --y:42%; --mx:86%; --my:44%"><img src="/img/bijus/ear-cuffs-dourados.webp" alt="" width="81" height="283"><figcaption>Ear cuffs</figcaption></figure>
+          <figure class="jp" data-depth="1.6" data-grp="b" style="--x:19%; --y:70%; --mx:16%; --my:76%"><img src="/img/bijus/anel-dourado-texturizado.webp" alt="" width="110" height="116"><figcaption>Anel texturizado</figcaption></figure>
+          <figure class="jp" data-depth="0.8" data-grp="b" style="--x:60%; --y:86%; --mx:78%; --my:93%"><img src="/img/bijus/anel-dourado-fino.webp" alt="" width="107" height="103"><figcaption>Anel aro fino</figcaption></figure>
+        </div>
+      </div>
       <div class="copy">
-        <div class="step wrap" data-from="0" data-to="1.01"><div class="in">
-          <div class="eyebrow">Bijuterias</div>
-          <h2>Argola dourada com gota de esmeralda</h2>
-          <p>Banho dourado e pedras que pegam a luz. Brincos, colares, anéis e pulseiras.</p>
+        <div class="step wrap" data-from="0" data-to="0.5"><div class="in">
+          <div class="eyebrow">Bijuterias · vitrine</div>
+          <h2>Pulseira de elos dourados</h2>
+          <p>Elos longos presos por esferas, banho dourado. A peça que abre a vitrine.</p>
+        </div></div>
+        <div class="step wrap" data-from="0.5" data-to="1.01"><div class="in">
+          <div class="eyebrow">Na mesma vitrine</div>
+          <h2>Anéis e ear cuffs</h2>
+          <p>Três anéis de aro aberto, lisos e com relevo, e um kit de ear cuffs. Valores sob consulta.</p>
           <a class="cta" href="#loja-bijus">Ver as bijuterias</a>
         </div></div>
       </div>
@@ -276,10 +325,10 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
     <div class="wrap">
       <div class="shelf-head">
         <div><div class="eyebrow">Bijuterias</div><h2>Bijuterias</h2></div>
-        <p>Peças com banho dourado. Chegam em embalagem para presente.</p>
+        <p>Pulseira, anéis e ear cuffs dourados. Toque na peça para ver de perto e pedir pelo WhatsApp.</p>
       </div>
-      <div class="grid" data-cat="jewel"></div>
-      <p class="shelf-note">Prévia: produtos, nomes e preços são de exemplo. As imagens são ilustrações 3D, não fotos de produtos reais.</p>
+      <div class="grid grid-bijus" data-cat="jewel"></div>
+      <p class="shelf-note">Fotos das peças do estoque. Valores sob consulta pelo WhatsApp.</p>
     </div>
   </section>
 </main>
@@ -287,7 +336,7 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
 <footer class="foot">
   <div class="wrap">
     <a class="logo" href="#perfumes">ÂMBAR<small>Perfumes · Tênis · Bijus</small></a>
-    <p>Prévia de loja virtual para apresentação. Nome, produtos e preços são provisórios. Pedidos saem pelo WhatsApp com a lista pronta. Modelo 3D do tênis: "Materials Variants Shoe" © 2021 Shopify, licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, via Khronos glTF Sample Assets. Frascos e bijuterias modelados para esta prévia.</p>
+    <p>Prévia de loja virtual para apresentação. Nome, produtos e preços são provisórios. Pedidos saem pelo WhatsApp com a lista pronta. Modelo 3D do tênis: "Materials Variants Shoe" © 2021 Shopify, licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, via Khronos glTF Sample Assets. Frascos modelados para esta prévia. Bijuterias: fotos das próprias peças, recortadas da embalagem.</p>
   </div>
 </footer>
 

@@ -1,9 +1,9 @@
-// One WebGL canvas behind three pinned stages: perfume (cap opens and sprays), sneaker, earring.
+// One WebGL canvas behind the pinned 3D stages: perfume (cap opens and sprays) and sneaker.
 // Each stage's scroll progress drives its scene; only the stage on screen is rendered.
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
-import { makePerfume, makeJewel, studioEnv, setVariant } from "./lib3d.js";
+import { makePerfume, studioEnv, setVariant } from "./lib3d.js";
 
 const canvas = document.getElementById("gl");
 const small = () => innerWidth <= 760;
@@ -47,7 +47,6 @@ if (renderer) {
   const camera = new THREE.PerspectiveCamera(30, 1, 0.05, 100);
   const envWarm = studioEnv(THREE, renderer, true);
   const envCool = studioEnv(THREE, renderer, false);
-  const envPlum = studioEnv(THREE, renderer, true, 0x140c12);
 
   function softTex(stops) {
     const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
@@ -194,30 +193,7 @@ if (renderer) {
     };
   })();
 
-  // ---------- earring ----------
-  const jewel = (() => {
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#140c12"); scene.environment = envPlum; scene.environmentIntensity = 1.4;
-    const key = new THREE.DirectionalLight("#ffe6c4", 2); key.position.set(-2, 4, 4); scene.add(key);
-    floor(scene, "rgba(255,170,200,0.1)", 1.6);
-    const e = makeJewel(THREE, "hoop", { gem: "#1c9b6e" }); e.scale.setScalar(1.55); e.position.y = 1.55; scene.add(e);
-    const M = 46, sparks = particles(M, "#fff3d6"); scene.add(sparks);
-    const spos = sparks.geometry.attributes.position.array, ssz = sparks.geometry.attributes.aSize.array, sal = sparks.geometry.attributes.aAlpha.array, seed = new Float32Array(M);
-    for (let i = 0; i < M; i++) { const a = Math.random() * Math.PI * 2, r = 0.55 + Math.random() * 0.25; spos.set([Math.cos(a) * r, 1.55 + Math.sin(a) * r * 1.1 - 0.15, (Math.random() - 0.5) * 0.3], i * 3); seed[i] = Math.random() * 20; }
-    return {
-      scene,
-      frame: { wide: { pos: [0, 1.4, 5.9], look: [0, 1.2, 0], fov: 30, shift: [-0.2, 0] }, tall: { pos: [0, 1.5, 7.8], look: [0, 1.25, 0], fov: 38, shift: [0, 0.22] } },
-      update(p, t) {
-        e.rotation.y = p * Math.PI * 1.6 + t * 0.35;
-        e.rotation.z = Math.sin(t * 1.1) * 0.05;
-        for (let i = 0; i < M; i++) { const w = Math.max(0, Math.sin(t * 2.2 + seed[i])); ssz[i] = 0.02 + w * w * w * 0.12; sal[i] = w * w; }
-        sparks.geometry.attributes.aSize.needsUpdate = sparks.geometry.attributes.aAlpha.needsUpdate = true;
-        return { push: 0 };
-      },
-    };
-  })();
-
-  const SCENES = { perfume, shoe, jewel };
+  const SCENES = { perfume, shoe }; // the jewellery stage is real photos in the DOM, not WebGL
   let W = 0, H = 0;
   function resize() {
     W = innerWidth; H = innerHeight;
@@ -233,6 +209,7 @@ if (renderer) {
     const active = readStages();
     if (!active) return;
     const S = SCENES[active.kind];
+    if (!S) return;
     const out = S.update(active.p, t, dt) || {};
     const f = small() ? S.frame.tall : S.frame.wide;
     const look = new THREE.Vector3(...f.look), pos = new THREE.Vector3(...f.pos);
