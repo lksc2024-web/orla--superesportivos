@@ -1,9 +1,8 @@
-// One WebGL canvas behind the pinned 3D stages: perfume (cap opens and sprays) and sneaker.
-// Each stage's scroll progress drives its scene; only the stage on screen is rendered.
+// One WebGL canvas behind three pinned stages.
+// Perfume and shoes: the store's own photos, each with a depth map, drawn by a shader so the near parts
+// (bottle, shoe) move more than the background: real parallax driven by the scroll.
+// Jewellery: real photos in layers, handled in app.js.
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
-import { makePerfume, studioEnv, setVariant } from "./lib3d.js";
 
 const canvas = document.getElementById("gl");
 const small = () => innerWidth <= 760;
@@ -40,165 +39,140 @@ try {
   renderer = null; // posters stay visible
 }
 
+const PHOTO_VERT = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+const PHOTO_FRAG = `precision highp float;
+varying vec2 vUv;
+uniform sampler2D uImgA, uDepA, uImgB, uDepB;
+uniform vec2 uRes, uResA, uResB, uLook, uCenA, uCenB;
+uniform float uZoomA, uZoomB, uMix, uContain, uFeather, uLight, uShadeLeft, uShadeBottom;
+uniform vec3 uBg;
+vec2 fit(vec2 uv, vec2 ires, float zoom, vec2 c){
+  float rs = uRes.x / uRes.y, ri = ires.x / ires.y;
+  vec2 cover = rs > ri ? vec2(1.0, ri / rs) : vec2(rs / ri, 1.0);
+  vec2 contain = rs > ri ? vec2(rs / ri, 1.0) : vec2(1.0, ri / rs);
+  vec2 s = mix(cover, contain, uContain) / zoom;
+  return (uv - 0.5) * s + c;
+}
+vec3 layer(sampler2D img, sampler2D dep, vec2 ires, float zoom, vec2 c){
+  vec2 uv = fit(vUv, ires, zoom, c);
+  float d = texture2D(dep, clamp(uv, 0.001, 0.999)).r;
+  // near pixels slide further than far ones: the parallax
+  vec2 q = uv + uLook * vec2(0.022, 0.016) * (d - 0.42);
+  vec3 col = texture2D(img, clamp(q, 0.001, 0.999)).rgb;
+  // a soft light passing over the near surfaces
+  float band = exp(-pow((q.x * 0.85 + q.y * 0.45 - uLight) * 6.0, 2.0));
+  col += col * band * smoothstep(0.45, 0.85, d) * 0.35;
+  if (uFeather > 0.0) {
+    float a = smoothstep(0.0, uFeather * 0.5, q.x) * smoothstep(1.0, 1.0 - uFeather * 0.5, q.x) * smoothstep(0.0, uFeather * 1.3, q.y) * smoothstep(1.0, 1.0 - uFeather * 1.3, q.y);
+    col = mix(uBg, col, a);
+  } else if (q.x < 0.0 || q.x > 1.0 || q.y < 0.0 || q.y > 1.0) col = uBg;
+  return col;
+}
+void main(){
+  vec3 col = layer(uImgA, uDepA, uResA, uZoomA, uCenA);
+  if (uMix > 0.001) col = mix(col, layer(uImgB, uDepB, uResB, uZoomB, uCenB), uMix);
+  // reading shade behind the text, and a light vignette
+  col *= 1.0 - uShadeLeft * smoothstep(0.62, 0.0, vUv.x) * 0.75;
+  col *= 1.0 - uShadeBottom * smoothstep(0.5, 0.0, vUv.y) * 0.8;
+  vec2 v = vUv - 0.5; col *= 1.0 - dot(v, v) * 0.55;
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
 if (renderer) {
-  renderer.setPixelRatio(Math.min(devicePixelRatio, small() ? 1.25 : 1.5));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;
   const camera = new THREE.PerspectiveCamera(30, 1, 0.05, 100);
-  const envWarm = studioEnv(THREE, renderer, true);
-  const envCool = studioEnv(THREE, renderer, false);
+  const flat = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const loader = new THREE.TextureLoader();
+  const tex = (src, depth) => {
+    const t = loader.load(src, () => { t.userData.ok = true; });
+    t.colorSpace = THREE.NoColorSpace; t.minFilter = THREE.LinearMipmapLinearFilter; t.anisotropy = 4;
+    t.userData.depth = depth; return t;
+  };
+  const photoSet = (name) => ({ img: tex(`/img/stage/${name}.webp`), dep: tex(`/img/stage/${name}-d.webp`, true) });
+  const sizeOf = (t) => t.image ? new THREE.Vector2(t.image.naturalWidth || t.image.width, t.image.naturalHeight || t.image.height) : new THREE.Vector2(1, 1);
 
-  function softTex(stops) {
-    const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
-    const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); stops.forEach(([o, col]) => gr.addColorStop(o, col));
-    g.fillStyle = gr; g.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
-  }
-  const dotTex = softTex([[0, "rgba(255,255,255,1)"], [0.35, "rgba(255,255,255,0.5)"], [1, "rgba(255,255,255,0)"]]);
-  function floor(scene, glow, shadowScale) {
-    const pool = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshBasicMaterial({ map: softTex([[0, glow], [1, "rgba(0,0,0,0)"]]), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
-    pool.rotation.x = -Math.PI / 2; scene.add(pool);
-    const sh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: softTex([[0, "rgba(0,0,0,0.7)"], [0.5, "rgba(0,0,0,0.25)"], [1, "rgba(0,0,0,0)"]]), transparent: true, depthWrite: false, toneMapped: false }));
-    sh.rotation.x = -Math.PI / 2; sh.position.y = 0.002; sh.scale.setScalar(shadowScale); scene.add(sh);
-    return sh;
-  }
-  // particle system with per-particle size and alpha
-  function particles(n, color, blending = THREE.AdditiveBlending) {
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-    geo.setAttribute("aSize", new THREE.BufferAttribute(new Float32Array(n), 1));
-    geo.setAttribute("aAlpha", new THREE.BufferAttribute(new Float32Array(n), 1));
+  function photoScene(bg) {
+    const scene = new THREE.Scene();
     const mat = new THREE.ShaderMaterial({
-      uniforms: { map: { value: dotTex }, color: { value: new THREE.Color(color) }, scale: { value: 300 } },
-      vertexShader: `attribute float aSize; attribute float aAlpha; varying float vA; uniform float scale;
-        void main(){ vA = aAlpha; vec4 mv = modelViewMatrix * vec4(position,1.0); gl_PointSize = aSize * scale / -mv.z; gl_Position = projectionMatrix * mv; }`,
-      fragmentShader: `uniform sampler2D map; uniform vec3 color; varying float vA;
-        void main(){ vec4 t = texture2D(map, gl_PointCoord); gl_FragColor = vec4(color, t.a * vA); }`,
-      transparent: true, depthWrite: false, blending,
+      vertexShader: PHOTO_VERT, fragmentShader: PHOTO_FRAG, depthTest: false, depthWrite: false, toneMapped: false,
+      uniforms: {
+        uImgA: { value: null }, uDepA: { value: null }, uImgB: { value: null }, uDepB: { value: null },
+        uRes: { value: new THREE.Vector2(1, 1) }, uResA: { value: new THREE.Vector2(1, 1) }, uResB: { value: new THREE.Vector2(1, 1) },
+        uLook: { value: new THREE.Vector2() }, uCenA: { value: new THREE.Vector2(0.5, 0.5) }, uCenB: { value: new THREE.Vector2(0.5, 0.5) },
+        uZoomA: { value: 1 }, uZoomB: { value: 1 }, uMix: { value: 0 }, uContain: { value: 0 }, uFeather: { value: 0 }, uLight: { value: -1 },
+        uShadeLeft: { value: 0 }, uShadeBottom: { value: 0 }, uBg: { value: new THREE.Color(bg) },
+      },
     });
-    const pts = new THREE.Points(geo, mat); pts.frustumCulled = false;
-    return pts;
+    const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false; scene.add(quad);
+    return { scene, u: mat.uniforms, flat: true };
   }
+  const ready = (s) => s.img.userData.ok && s.dep.userData.ok;
 
-  // ---------- perfume ----------
+  // ---------- featured perfume: Sauvage ----------
   const perfume = (() => {
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#120d0a"); scene.environment = envWarm; scene.environmentIntensity = 1.2;
-    const key = new THREE.DirectionalLight("#ffd9a8", 1.6); key.position.set(-2, 4, 3); scene.add(key);
-    floor(scene, "rgba(255,190,120,0.18)", 2.2);
-    const b = makePerfume(THREE, { shape: "oct", glass: "#f4e1c0", liquid: "#a5531a", cap: "crown" });
-    const S = 1.35; b.group.scale.setScalar(S); scene.add(b.group);
-    b.group.traverse((o) => { if (o.isMesh && o.material.transmission) { o.material.envMapIntensity = 0.5; o.material.clearcoat = 0.4; o.material.specularIntensity = 0.6; } });
-    // the cap leaves the bottle, so it lives in world space
-    b.group.remove(b.cap); b.cap.scale.setScalar(S); scene.add(b.cap);
-
-    // spray
-    const N = 1800, sp = particles(N, "#fbeedd", THREE.NormalBlending); scene.add(sp);
-    const P = { pos: new Float32Array(N * 3), vel: new Float32Array(N * 3), age: new Float32Array(N).fill(99), life: new Float32Array(N), size: new Float32Array(N) };
-    let head = 0;
-    function emit(count, origin, dir) {
-      for (let k = 0; k < count; k++) {
-        const i = head; head = (head + 1) % N;
-        const spread = 0.42, sx = (Math.random() - 0.5) * spread, sy = (Math.random() - 0.5) * spread, sz = (Math.random() - 0.5) * spread;
-        const v = new THREE.Vector3(dir.x + sx, dir.y + sy, dir.z + sz).normalize().multiplyScalar(1.8 + Math.random() * 2.4);
-        P.pos.set([origin.x, origin.y, origin.z], i * 3); P.vel.set([v.x, v.y, v.z], i * 3);
-        P.age[i] = 0; P.life[i] = 1.3 + Math.random() * 1.6; P.size[i] = Math.random() < 0.05 ? 0.012 : 0.03 + Math.random() * 0.05;
-      }
-    }
-    // floating gold dust for atmosphere
-    const D = 260, dust = particles(D, "#e9c27a"); scene.add(dust);
-    const dpos = dust.geometry.attributes.position.array, dsz = dust.geometry.attributes.aSize.array, dal = dust.geometry.attributes.aAlpha.array, dseed = new Float32Array(D);
-    for (let i = 0; i < D; i++) { dpos.set([(Math.random() - 0.5) * 7, Math.random() * 4, (Math.random() - 0.5) * 4 - 0.5], i * 3); dsz[i] = 0.01 + Math.random() * 0.025; dseed[i] = Math.random() * 10; }
-
-    const tipW = new THREE.Vector3(), dir = new THREE.Vector3();
-    let sprayClock = 0, pulse = 0;
+    const ph = photoScene("#07090d"), u = ph.u;
+    const sv = photoSet("sauvage");
+    let eased = 0;
     return {
-      scene,
-      frame: { wide: { pos: [0, 1.45, 7.0], look: [0, 1.1, 0], fov: 30, shift: [-0.2, 0] }, tall: { pos: [0, 1.6, 8.4], look: [0, 1.25, 0], fov: 36, shift: [0, 0.2] } },
+      ...ph,
       update(p, t, dt) {
-        const g = b.group;
-        const spray = smooth(0.5, 0.56, p) * (1 - smooth(0.8, 0.86, p));
-        g.rotation.y = 0.55 + p * 1.1 + Math.sin(t * 0.4) * 0.08 - spray * 0.4;
-        g.rotation.z = -0.06 * spray;
-        // cap: lifts off with a spin, then arcs down and lies on the floor beside the bottle
-        const up = smooth(0.24, 0.36, p), aside = smooth(0.35, 0.5, p);
-        const rest = small() ? [-0.8, 0.8] : [-1.35, 0.45];
-        const liftY = (b.capY + up * 0.35) * S;
-        b.cap.position.set(rest[0] * aside, liftY * (1 - aside) + 0.21 * aside + Math.sin(aside * Math.PI) * 0.35, rest[1] * aside);
-        b.cap.rotation.set(0, g.rotation.y + up * Math.PI * 2 + aside * 0.8, aside * Math.PI / 2);
-        // spray: steady mist plus a stronger burst on each press
-        if (spray > 0.01) {
-          sprayClock += dt;
-          if (sprayClock > 1.1) { sprayClock = 0; pulse = 1; }
-        } else { sprayClock = 0.9; }
-        pulse = Math.max(0, pulse - dt * 3.2);
-        g.updateMatrixWorld(true);
-        tipW.copy(b.tip).applyMatrix4(g.matrixWorld);
-        dir.set(0.55, 0.42, 0.75).normalize();
-        if (spray > 0.01) emit(Math.floor((40 * spray + 220 * pulse) * dt * 10), tipW, dir);
-        const pos = sp.geometry.attributes.position.array, sz = sp.geometry.attributes.aSize.array, al = sp.geometry.attributes.aAlpha.array;
-        for (let i = 0; i < N; i++) {
-          if (P.age[i] > P.life[i]) { al[i] = 0; continue; }
-          P.age[i] += dt;
-          const k = i * 3, drag = Math.exp(-dt * 1.7);
-          P.vel[k] *= drag; P.vel[k + 1] = P.vel[k + 1] * drag + 0.18 * dt; P.vel[k + 2] *= drag;
-          P.pos[k] += P.vel[k] * dt; P.pos[k + 1] += P.vel[k + 1] * dt; P.pos[k + 2] += P.vel[k + 2] * dt;
-          pos[k] = P.pos[k]; pos[k + 1] = P.pos[k + 1]; pos[k + 2] = P.pos[k + 2];
-          const a = P.age[i] / P.life[i];
-          sz[i] = P.size[i] * (1 + a * 7);
-          al[i] = Math.sin(Math.min(a * 6, 1) * Math.PI / 2) * (1 - a) * (1 - a) * (P.size[i] < 0.02 ? 0.9 : 0.22);
-        }
-        sp.geometry.attributes.position.needsUpdate = sp.geometry.attributes.aSize.needsUpdate = sp.geometry.attributes.aAlpha.needsUpdate = true;
-        for (let i = 0; i < D; i++) {
-          const k = i * 3; dpos[k + 1] += dt * 0.05; if (dpos[k + 1] > 4) dpos[k + 1] = 0;
-          dal[i] = 0.25 + 0.25 * Math.sin(t * 1.3 + dseed[i]);
-        }
-        dust.geometry.attributes.position.needsUpdate = dust.geometry.attributes.aAlpha.needsUpdate = true;
-        return { push: 0.06 * smooth(0.8, 1, p) };
+        if (!ready(sv)) return { wait: true };
+        eased += (p - eased) * (1 - Math.exp(-dt * 6));
+        const e = eased, m = small();
+        u.uImgA.value = sv.img; u.uDepA.value = sv.dep; u.uResA.value = sizeOf(sv.img); u.uMix.value = 0;
+        // the whole scene at the side of the text, then a slow push towards the bottle as you scroll
+        const push = smooth(0, 1, e);
+        if (m) { u.uZoomA.value = 1.25 + 0.3 * push; u.uCenA.value.set(0.585, 0.30 + 0.05 * push); }
+        else { const z = 1.0 + 0.14 * push, rs = innerWidth / innerHeight, sx = (rs / 0.94) / z; u.uZoomA.value = z; u.uCenA.value.set(0.5 - 0.2 * sx, 0.5 + 0.03 * push); }
+        u.uLook.value.set(Math.sin(t * 0.32) * 0.35 + (e - 0.5) * 2.2, Math.cos(t * 0.26) * 0.25 - (e - 0.5) * 0.9);
+        u.uLight.value = -0.2 + smooth(0.08, 0.7, e) * 1.9;
+        u.uContain.value = 1; u.uFeather.value = 0.14;
+        u.uShadeLeft.value = m ? 0 : 0.5; u.uShadeBottom.value = m ? 0.5 : 0;
+        return {};
       },
     };
   })();
 
-  // ---------- sneaker ----------
+  // ---------- featured shoes: one per category ----------
+  const SHOES = ["s-tenis", "s-sandalia", "s-sapatilha", "s-rasteira", "s-salto"].map(photoSet);
   const shoe = (() => {
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#15161a"); scene.environment = envCool; scene.environmentIntensity = 1.0;
-    const key = new THREE.DirectionalLight("#ffffff", 2.2); key.position.set(-3, 5, 4); scene.add(key);
-    const rim = new THREE.DirectionalLight("#c9a25a", 1.4); rim.position.set(4, 2, -3); scene.add(rim);
-    const sh = floor(scene, "rgba(150,170,210,0.12)", 3);
-    const holder = new THREE.Group(); scene.add(holder);
-    let gltf = null;
-    const d = new DRACOLoader(); d.setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/");
-    const l = new GLTFLoader(); l.setDRACOLoader(d);
-    l.load("/shoe.glb", async (g) => { gltf = g; g.scene.scale.setScalar(7.2); holder.add(g.scene); await setVariant(g, "midnight"); });
-    for (const btn of document.querySelectorAll(".chips3d button")) {
-      btn.addEventListener("click", async () => {
-        document.querySelectorAll(".chips3d button").forEach((x) => x.setAttribute("aria-pressed", String(x === btn)));
-        if (gltf) await setVariant(gltf, btn.dataset.variant);
-      });
-    }
+    const ph = photoScene("#1a120c"), u = ph.u;
+    let eased = 0;
+    const place = (q, m) => {
+      // where the photo sits: right side on desktop (text on the left), upper half on phones (text below)
+      const zoom = m ? 1.04 : 0.66;
+      const sx = m ? 0.5 : 0.21, sy = m ? 0.06 : 0.46;
+      return { zoom: zoom * (1 + 0.1 * q), cx: sx + (q - 0.5) * 0.06, cy: sy };
+    };
     return {
-      scene,
-      frame: { wide: { pos: [0, 1.35, 5.5], look: [0, 0.6, 0], fov: 30, shift: [-0.2, 0] }, tall: { pos: [0, 2.0, 8.2], look: [0, 0.7, 0], fov: 40, shift: [0, 0.2] } },
-      update(p, t) {
-        // a full turn with the scroll plus a few strides: heel-toe rock and small hops
-        const strides = Math.sin(p * Math.PI * 6);
-        const hop = Math.abs(strides) * 0.28 * (1 - smooth(0.85, 1, p));
-        holder.rotation.y = -0.6 + p * Math.PI * 2 + t * 0.12;
-        holder.rotation.z = strides * 0.1;
-        holder.position.y = hop + Math.sin(t * 1.6) * 0.02;
-        sh.scale.setScalar(3 - hop * 2.5);
-        sh.material.opacity = 1 - hop * 1.6;
-        return { push: 0 };
+      ...ph,
+      update(p, t, dt) {
+        if (!SHOES.every(ready)) return { wait: true };
+        eased += (p - eased) * (1 - Math.exp(-dt * 6));
+        const n = SHOES.length, x = clamp(eased * n, 0, n - 0.0001), i = Math.floor(x), q = x - i;
+        const m = small();
+        const A = SHOES[i], B = SHOES[Math.min(n - 1, i + 1)];
+        const mix = i < n - 1 ? smooth(0.72, 1, q) : 0;
+        const a = place(q, m), b = place(0, m);
+        u.uImgA.value = A.img; u.uDepA.value = A.dep; u.uResA.value = sizeOf(A.img);
+        u.uImgB.value = B.img; u.uDepB.value = B.dep; u.uResB.value = sizeOf(B.img);
+        u.uZoomA.value = a.zoom * (1 + 0.08 * mix); u.uCenA.value.set(a.cx + mix * 0.08, a.cy);
+        u.uZoomB.value = b.zoom * (0.92 + 0.08 * mix); u.uCenB.value.set(b.cx - (1 - mix) * 0.08, b.cy);
+        u.uMix.value = mix;
+        u.uLook.value.set(Math.sin(t * 0.4) * 0.35 + (q - 0.5) * 2.4, Math.cos(t * 0.3) * 0.25 + (q - 0.5) * -0.6);
+        u.uLight.value = -0.3 + q * 1.9;
+        u.uContain.value = 1; u.uFeather.value = 0.12;
+        u.uShadeLeft.value = m ? 0 : 0.6; u.uShadeBottom.value = m ? 0.6 : 0;
+        return {};
       },
     };
   })();
 
-  const SCENES = { perfume, shoe }; // the jewellery stage is real photos in the DOM, not WebGL
+  const SCENES = { perfume, shoe }; // the jewellery stage is real photos in the DOM (app.js), not WebGL
   let W = 0, H = 0;
-  function resize() {
-    W = innerWidth; H = innerHeight;
-    renderer.setSize(W, H, false);
-  }
+  function resize() { W = innerWidth; H = innerHeight; renderer.setSize(W, H, false); }
   addEventListener("resize", resize); resize();
 
   const clock = new THREE.Clock();
@@ -211,16 +185,21 @@ if (renderer) {
     const S = SCENES[active.kind];
     if (!S) return;
     const out = S.update(active.p, t, dt) || {};
-    const f = small() ? S.frame.tall : S.frame.wide;
-    const look = new THREE.Vector3(...f.look), pos = new THREE.Vector3(...f.pos);
-    pos.lerp(look, out.push || 0);
-    camera.fov = f.fov; camera.aspect = W / H;
-    camera.setViewOffset(W, H, f.shift[0] * W, f.shift[1] * H, W, H);
-    camera.position.copy(pos); camera.lookAt(look);
-    camera.updateProjectionMatrix();
-    const ppu = renderer.getPixelRatio() * H / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
-    S.scene.traverse((o) => { if (o.isPoints) o.material.uniforms.scale.value = ppu; });
-    renderer.render(S.scene, camera);
+    if (out.wait) return;
+    if (S.flat) {
+      S.u.uRes.value.set(W, H);
+      renderer.render(S.scene, flat);
+    } else {
+      const f = small() ? S.frame.tall : S.frame.wide;
+      const look = new THREE.Vector3(...f.look), pos = new THREE.Vector3(...f.pos);
+      camera.fov = f.fov; camera.aspect = W / H;
+      camera.setViewOffset(W, H, f.shift[0] * W, f.shift[1] * H, W, H);
+      camera.position.copy(pos); camera.lookAt(look);
+      camera.updateProjectionMatrix();
+      const ppu = renderer.getPixelRatio() * H / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
+      S.scene.traverse((o) => { if (o.isPoints) o.material.uniforms.scale.value = ppu; });
+      renderer.render(S.scene, camera);
+    }
     if (!shown) { shown = true; document.body.classList.add("gl-on"); }
   });
 }

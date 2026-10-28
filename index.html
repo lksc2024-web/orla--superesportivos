@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Âmbar · Perfumes, Tênis e Bijuterias</title>
-<meta name="description" content="Prévia de loja virtual: perfumes árabes, tênis e bijuterias, com pedido pelo WhatsApp.">
+<title>Âmbar · Perfumes, Calçados e Bijuterias</title>
+<meta name="description" content="Prévia de loja virtual: perfumes importados, calçados e bijuterias, com pedido pelo WhatsApp.">
 <meta name="theme-color" content="#120d0a">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23120d0a'/%3E%3Cpath d='M16 6l9 20h-4l-1.8-4h-6.4L11 26H7zm-1.9 12h3.8L16 13.6z' fill='%23c9a25a'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -102,11 +102,38 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 400; margin: 0; letter-
 .add:hover { background: var(--ink); color: var(--paper); }
 .shelf-note { margin-top: 34px; font: 400 12px/1.6 var(--f-mono); color: var(--ink-soft); }
 
+/* perfumes: Sauvage wide on top, then the grid */
+.grid-perf .card-media { aspect-ratio: 9 / 7; }
+.grid-perf .card.wide { grid-column: 1 / -1; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); column-gap: clamp(24px, 4vw, 56px); align-content: center; margin-bottom: 18px; }
+.grid-perf .card.wide .card-media { aspect-ratio: 1 / 1; grid-row: 1 / span 2; }
+.grid-perf .card.wide .card-media img { object-position: 60% 50%; }
+.grid-perf .card.wide .card-row { grid-column: 2; align-self: end; flex-direction: column; align-items: flex-start; gap: 14px; }
+.grid-perf .card.wide h3 { font: 400 clamp(2rem, 4vw, 3.2rem)/1 var(--f-display); }
+.grid-perf .card.wide .note { font-size: 1rem; margin-top: 8px; }
+.grid-perf .card.wide .add { grid-column: 2; align-self: start; padding: 14px 22px; }
+/* shoes: one row per category, featured shoe wide plus the variations */
+.shoe-rows { display: grid; gap: 54px; }
+.shoe-row-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; scroll-margin-top: 90px; }
+.shoe-row-head h3 { font: 400 1.9rem/1 var(--f-display); }
+.shoe-row-head span { color: var(--ink-soft); font-style: italic; }
+.shoe-track { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 18px; }
+.shoe-track .card-media { aspect-ratio: auto; height: clamp(190px, 21vw, 270px); }
+.price.ask { color: var(--gold-deep); font-size: .85rem; }
+@media (max-width: 760px) {
+  .grid-perf .card.wide { grid-template-columns: 1fr; }
+  .grid-perf .card.wide .card-media { aspect-ratio: 1 / 1; grid-row: auto; }
+  .grid-perf .card.wide .card-row, .grid-perf .card.wide .add { grid-column: 1; }
+  .shoe-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin-inline: calc(-1 * var(--gl)) calc(-1 * var(--gr)); padding-inline: var(--gl) var(--gr); scrollbar-width: none; }
+  .shoe-track::-webkit-scrollbar { display: none; }
+  .shoe-track .card { flex: 0 0 46%; scroll-snap-align: start; }
+  .shoe-track .card:first-child { flex-basis: 84%; }
+  .shoe-track .card-media { height: 200px; }
+}
 /* quick view */
 dialog { border: 0; padding: 0; border-radius: 8px; max-width: min(860px, calc(100vw - 24px)); width: 100%; background: var(--paper); color: var(--ink); }
 dialog::backdrop { background: rgba(18, 13, 10, .6); }
 .qv { display: grid; grid-template-columns: 1fr 1fr; }
-.qv img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 5; background: var(--ivory); }
+.qv img { width: 100%; height: 100%; object-fit: contain; aspect-ratio: 4 / 5; background: #1a120c; }
 .qv-body { padding: 30px; display: grid; gap: 16px; align-content: start; min-width: 0; }
 .qv-body h3 { font: 400 2rem/1.05 var(--f-display); }
 .qv-body .eyebrow { color: var(--gold-deep); }
@@ -153,6 +180,7 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
 .jarch::after { content: ""; position: absolute; left: -14%; right: -14%; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201, 162, 90, .4), transparent); }
 .jrig { position: absolute; inset: 0; --k: 1.12; }
 .jp { position: absolute; left: var(--x); top: var(--y); margin: 0; display: grid; justify-items: center; gap: 10px; transform: translate(-50%, -50%); will-change: transform; }
+.jp-main { transform-origin: 50% 0; }
 .jp img { width: calc(var(--w) * var(--k)); height: auto; max-width: none; filter: drop-shadow(0 calc(14px * var(--d, 1)) calc(14px * var(--d, 1)) rgba(0, 0, 0, .55)); }
 .jp figcaption { font: 500 9.5px/1 var(--f-mono); letter-spacing: .2em; text-transform: uppercase; color: rgba(239, 230, 214, .5); white-space: nowrap; }
 .jp::after { content: ""; position: absolute; left: 50%; top: 0; margin-left: calc(var(--w) * var(--k) / -2); height: calc(var(--h) * var(--k)); width: calc(var(--w) * var(--k)); pointer-events: none; -webkit-mask: var(--src) center / 100% 100% no-repeat; mask: var(--src) center / 100% 100% no-repeat; background: linear-gradient(105deg, transparent 40%, rgba(255, 240, 210, .55) 50%, transparent 60%) calc(var(--g, 0) * 1%) 0 / 320% 100% no-repeat; mix-blend-mode: screen; opacity: .7; }
@@ -212,10 +240,10 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
 
 <header class="top" id="top">
   <div class="wrap">
-    <a class="logo" href="#perfumes">ÂMBAR<small>Perfumes · Tênis · Bijus</small></a>
+    <a class="logo" href="#perfumes">ÂMBAR<small>Perfumes · Calçados · Bijus</small></a>
     <nav aria-label="Categorias">
       <a href="#loja-perfumes" data-sec="perfumes">Perfumes</a>
-      <a href="#loja-tenis" data-sec="tenis">Tênis</a>
+      <a href="#loja-calcados" data-sec="calcados">Calçados</a>
       <a href="#loja-bijus" data-sec="bijus">Bijuterias</a>
       <button class="cart-btn" id="open-cart" type="button" aria-label="Abrir sacola">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
@@ -226,29 +254,25 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
 </header>
 
 <main>
-  <!-- 1. perfume -->
-  <section class="stage" id="perfumes" data-stage="perfume" style="height: 380vh">
+  <!-- 1. featured perfume -->
+  <section class="stage" id="perfumes" data-stage="perfume" style="height: 360vh">
     <div class="pin">
-      <div class="poster" style="--pd: url(/img/stage-perfume.webp); --pm: url(/img/stage-perfume-m.webp)"></div>
+      <div class="poster" style="--pd: url(/img/stage/sauvage.webp); --pm: url(/img/stage/sauvage.webp)"></div>
       <div class="copy">
-        <div class="step wrap" data-from="0" data-to="0.22"><div class="in">
-          <div class="eyebrow">Perfumes árabes</div>
-          <h1>Oud, âmbar e açafrão</h1>
-          <p>Fragrâncias marcantes, de fixação longa. Role para abrir o frasco.</p>
+        <div class="step wrap" data-from="0" data-to="0.3"><div class="in">
+          <div class="eyebrow">Destaque · Dior</div>
+          <h1>Sauvage</h1>
+          <p>Eau de Parfum. Role a tela para chegar perto do frasco.</p>
         </div></div>
-        <div class="step wrap" data-from="0.24" data-to="0.5"><div class="in">
-          <div class="eyebrow">A tampa</div>
-          <h2>Ouro trabalhado, frasco facetado</h2>
-          <p>Cada perfume vem no frasco tradicional, pronto para presentear.</p>
+        <div class="step wrap" data-from="0.32" data-to="0.66"><div class="in">
+          <div class="eyebrow">Perfumes importados</div>
+          <h2>Os mais procurados da vitrine</h2>
+          <p>Chanel, Versace, Tom Ford, Yves Saint Laurent e Creed, ao lado do Sauvage.</p>
         </div></div>
-        <div class="step wrap" data-from="0.52" data-to="0.8"><div class="in">
-          <div class="eyebrow">Uma borrifada</div>
-          <h2>Dura o dia inteiro</h2>
-          <p>Notas de saída cítricas e especiadas, fundo de oud e âmbar.</p>
-        </div></div>
-        <div class="step wrap" data-from="0.82" data-to="1.01"><div class="in">
-          <div class="eyebrow">Na loja do salão</div>
+        <div class="step wrap" data-from="0.68" data-to="1.01"><div class="in">
+          <div class="eyebrow">Pedido pelo WhatsApp</div>
           <h2>Escolha o seu</h2>
+          <p>Monte a sacola no site e a lista chega pronta para a loja.</p>
           <a class="cta" href="#loja-perfumes">Ver os perfumes</a>
         </div></div>
       </div>
@@ -259,40 +283,50 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
   <section class="shelf" id="loja-perfumes">
     <div class="wrap">
       <div class="shelf-head">
-        <div><div class="eyebrow">Perfumes</div><h2>Perfumes árabes</h2></div>
-        <p>Frascos de 100 ml. Toque no produto para ver os detalhes e escolher.</p>
+        <div><div class="eyebrow">Perfumes</div><h2>Perfumes importados</h2></div>
+        <p>Toque no perfume para ver os detalhes e colocar na sacola.</p>
       </div>
-      <div class="grid" data-cat="perfume"></div>
+      <div class="grid grid-perf" data-cat="perfume"></div>
     </div>
   </section>
 
-  <!-- 2. sneakers -->
-  <section class="stage" id="tenis" data-stage="shoe" style="height: 280vh">
+  <!-- 2. featured shoes, one per category -->
+  <section class="stage" id="calcados" data-stage="shoe" style="height: 520vh">
     <div class="pin">
-      <div class="poster" style="--pd: url(/img/stage-shoe.webp); --pm: url(/img/stage-shoe-m.webp)"></div>
+      <div class="poster" style="--pd: url(/img/stage/s-tenis.webp); --pm: url(/img/stage/s-tenis.webp)"></div>
       <div class="copy">
-        <div class="step wrap" data-from="0" data-to="1.01"><div class="in">
-          <div class="eyebrow">Tênis em destaque</div>
-          <h2>Runner, leve para o dia todo</h2>
-          <p>Cabedal em malha respirável e solado macio. Escolha a cor:</p>
-          <div class="chips3d" role="group" aria-label="Cor do tênis">
-            <button type="button" data-variant="midnight" style="--c:#1f6f93" aria-pressed="true"><i></i>Oceano</button>
-            <button type="button" data-variant="beach" style="--c:#c99a93" aria-pressed="false"><i></i>Rosé</button>
-            <button type="button" data-variant="street" style="--c:#1c1c1c" aria-pressed="false"><i></i>Preto</button>
-          </div>
+        <div class="step wrap" data-from="0" data-to="0.2"><div class="in">
+          <div class="eyebrow">Calçados · 01</div><h2>Tênis</h2><p>Estilo e performance.</p>
+          <a class="cta-line" href="#cat-tenis">Ver os tênis</a>
+        </div></div>
+        <div class="step wrap" data-from="0.2" data-to="0.4"><div class="in">
+          <div class="eyebrow">Calçados · 02</div><h2>Sandálias</h2><p>Leveza e sofisticação.</p>
+          <a class="cta-line" href="#cat-sandalia">Ver as sandálias</a>
+        </div></div>
+        <div class="step wrap" data-from="0.4" data-to="0.6"><div class="in">
+          <div class="eyebrow">Calçados · 03</div><h2>Sapatilhas</h2><p>Conforto e elegância.</p>
+          <a class="cta-line" href="#cat-sapatilha">Ver as sapatilhas</a>
+        </div></div>
+        <div class="step wrap" data-from="0.6" data-to="0.8"><div class="in">
+          <div class="eyebrow">Calçados · 04</div><h2>Rasteirinhas</h2><p>Praticidade com estilo.</p>
+          <a class="cta-line" href="#cat-rasteira">Ver as rasteirinhas</a>
+        </div></div>
+        <div class="step wrap" data-from="0.8" data-to="1.01"><div class="in">
+          <div class="eyebrow">Calçados · 05</div><h2>Saltos</h2><p>Elegância em alta.</p>
+          <a class="cta" href="#loja-calcados">Ver todos os calçados</a>
         </div></div>
       </div>
-      <div class="meter"><span>Tênis</span><span class="bar"><i></i></span><span class="pct">02 / 03</span></div>
+      <div class="meter"><span>Calçados</span><span class="bar"><i></i></span><span class="pct">02 / 03</span></div>
     </div>
   </section>
 
-  <section class="shelf" id="loja-tenis">
+  <section class="shelf" id="loja-calcados">
     <div class="wrap">
       <div class="shelf-head">
-        <div><div class="eyebrow">Tênis</div><h2>Tênis</h2></div>
-        <p>Numeração do 34 ao 43. Os modelos do estoque real entram aqui com as fotos da loja.</p>
+        <div><div class="eyebrow">Calçados</div><h2>Calçados</h2></div>
+        <p>Tênis, sandálias, sapatilhas, rasteirinhas e saltos. Escolha a numeração no produto.</p>
       </div>
-      <div class="grid" data-cat="shoe"></div>
+      <div class="shoe-rows" data-shoes></div>
     </div>
   </section>
 
@@ -351,8 +385,8 @@ dialog::backdrop { background: rgba(18, 13, 10, .6); }
 
 <footer class="foot">
   <div class="wrap">
-    <a class="logo" href="#perfumes">ÂMBAR<small>Perfumes · Tênis · Bijus</small></a>
-    <p>Prévia de loja virtual para apresentação. Nome, produtos e preços são provisórios. Pedidos saem pelo WhatsApp com a lista pronta. Modelo 3D do tênis: "Materials Variants Shoe" © 2021 Shopify, licença <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, via Khronos glTF Sample Assets. Frascos modelados para esta prévia. Bijuterias: fotos das próprias peças da loja, recortadas do fundo.</p>
+    <a class="logo" href="#perfumes">ÂMBAR<small>Perfumes · Calçados · Bijus</small></a>
+    <p>Prévia de loja virtual para apresentação. Nome, produtos e preços são provisórios. Pedidos saem pelo WhatsApp com a lista pronta. Perfumes e calçados: fotos enviadas pela loja. Bijuterias: fotos das próprias peças da loja, recortadas do fundo.</p>
   </div>
 </footer>
 

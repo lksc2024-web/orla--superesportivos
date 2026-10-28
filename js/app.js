@@ -1,15 +1,37 @@
 // Store UI: product grids, quick view, bag (kept in this browser) and checkout message for WhatsApp.
 (() => {
+  const NUM_F = ["33", "34", "35", "36", "37", "38", "39", "40"];
+  const NUM_T = ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44"];
   const PRODUCTS = [
-    { id: "perf-oud", cat: "perfume", name: "Oud Al Layl", note: "Oud, couro e baunilha", price: 289, tag: "Mais pedido", opts: ["100 ml"] },
-    { id: "perf-amber", cat: "perfume", name: "Amber Sahra", note: "Âmbar, mel e especiarias", price: 249, opts: ["100 ml"] },
-    { id: "perf-taif", cat: "perfume", name: "Rosa de Taif", note: "Rosa, almíscar e açafrão", price: 269, opts: ["100 ml"] },
-    { id: "perf-bakhoor", cat: "perfume", name: "Bakhoor Noir", note: "Incenso, oud e patchouli", price: 319, tag: "Intenso", opts: ["100 ml"] },
-    { id: "perf-zafaran", cat: "perfume", name: "Zafaran Gold", note: "Açafrão, âmbar e madeira", price: 299, opts: ["100 ml"] },
-    { id: "perf-jasmin", cat: "perfume", name: "Jasmim de Medina", note: "Jasmim, flor de laranjeira e musk", price: 229, opts: ["100 ml"] },
-    { id: "tenis-midnight", cat: "shoe", name: "Runner Oceano", note: "Malha respirável, solado macio", price: 299, tag: "Destaque", opts: ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43"] },
-    { id: "tenis-beach", cat: "shoe", name: "Runner Rosé", note: "Malha respirável, solado macio", price: 299, opts: ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43"] },
-    { id: "tenis-street", cat: "shoe", name: "Runner Preto", note: "Malha respirável, solado macio", price: 299, opts: ["34", "35", "36", "37", "38", "39", "40", "41", "42", "43"] },
+    // perfumes: the featured one first (shown wide), then the shelf
+    { id: "sauvage", cat: "perfume", name: "Dior Sauvage", note: "Eau de Parfum", tag: "Destaque", opts: ["100 ml"], wide: true, price: null },
+    { id: "p-chanel5", cat: "perfume", name: "Chanel Nº5", note: "Eau de Parfum", opts: ["100 ml"], price: null },
+    { id: "p-bleu", cat: "perfume", name: "Bleu de Chanel", note: "Eau de Parfum", opts: ["100 ml"], price: null },
+    { id: "p-eros", cat: "perfume", name: "Versace Eros", note: "Masculino", opts: ["100 ml"], price: null },
+    { id: "p-oudwood", cat: "perfume", name: "Tom Ford Oud Wood", note: "Eau de Parfum", opts: ["100 ml"], price: null },
+    { id: "p-libre", cat: "perfume", name: "Yves Saint Laurent Libre", note: "Feminino", opts: ["90 ml"], price: null },
+    { id: "p-aventus", cat: "perfume", name: "Creed Aventus", note: "Masculino", opts: ["100 ml"], price: null },
+    // shoes: per category, the featured photo first and the variations after it
+    { id: "s-tenis", cat: "shoe", sub: "tenis", name: "Tênis branco clássico", note: "Couro, solado alto", tag: "Destaque", opts: NUM_T, price: null },
+    { id: "m-tenis-1", cat: "shoe", sub: "tenis", name: "Tênis preto listrado", note: "Esportivo", opts: NUM_T, price: null },
+    { id: "m-tenis-2", cat: "shoe", sub: "tenis", name: "Tênis cinza", note: "Casual", opts: NUM_T, price: null },
+    { id: "m-tenis-3", cat: "shoe", sub: "tenis", name: "Tênis colorido", note: "Corrida", opts: NUM_T, price: null },
+    { id: "s-sandalia", cat: "shoe", sub: "sandalia", name: "Sandália dourada de salto", note: "Tiras finas, fecho no tornozelo", tag: "Destaque", opts: NUM_F, price: null },
+    { id: "m-sandalia-1", cat: "shoe", sub: "sandalia", name: "Sandália trançada off-white", note: "Salto baixo", opts: NUM_F, price: null },
+    { id: "m-sandalia-2", cat: "shoe", sub: "sandalia", name: "Sandália preta de fivelas", note: "Salto bloco", opts: NUM_F, price: null },
+    { id: "m-sandalia-3", cat: "shoe", sub: "sandalia", name: "Sandália dourada de tiras", note: "Salto bloco", opts: NUM_F, price: null },
+    { id: "s-sapatilha", cat: "shoe", sub: "sapatilha", name: "Sapatilha matelassê nude", note: "Laço na frente", tag: "Destaque", opts: NUM_F, price: null },
+    { id: "m-sapatilha-1", cat: "shoe", sub: "sapatilha", name: "Sapatilha preta verniz", note: "Laço na frente", opts: NUM_F, price: null },
+    { id: "m-sapatilha-2", cat: "shoe", sub: "sapatilha", name: "Sapatilha vermelha verniz", note: "Laço na frente", opts: NUM_F, price: null },
+    { id: "m-sapatilha-3", cat: "shoe", sub: "sapatilha", name: "Sapatilha onça", note: "Laço na frente", opts: NUM_F, price: null },
+    { id: "s-rasteira", cat: "shoe", sub: "rasteira", name: "Rasteirinha dourada com brilho", note: "Tiras cruzadas", tag: "Destaque", opts: NUM_F, price: null },
+    { id: "m-rasteira-1", cat: "shoe", sub: "rasteira", name: "Rasteirinha preta", note: "Tira no tornozelo", opts: NUM_F, price: null },
+    { id: "m-rasteira-2", cat: "shoe", sub: "rasteira", name: "Rasteirinha branca", note: "Tiras largas", opts: NUM_F, price: null },
+    { id: "m-rasteira-3", cat: "shoe", sub: "rasteira", name: "Rasteirinha dourada", note: "Tiras finas", opts: NUM_F, price: null },
+    { id: "s-salto", cat: "shoe", sub: "salto", name: "Scarpin vermelho verniz", note: "Salto fino", tag: "Destaque", opts: NUM_F, price: null },
+    { id: "m-salto-1", cat: "shoe", sub: "salto", name: "Scarpin preto verniz", note: "Salto fino", opts: NUM_F, price: null },
+    { id: "m-salto-2", cat: "shoe", sub: "salto", name: "Scarpin nude", note: "Salto fino", opts: NUM_F, price: null },
+    { id: "m-salto-3", cat: "shoe", sub: "salto", name: "Scarpin prata com brilho", note: "Salto fino", opts: NUM_F, price: null },
     // jewellery: cut out of the store's own photo (native pixels; real = file width/height); price on request
     {"id": "relogio-cravejado", "cat": "jewel", "sub": "relogio", "real": [129, 256], "name": "Relógio prata cravejado", "note": "Pulseira de aço, mostrador branco, aro com strass", "price": null, "opts": ["Única"]},
     {"id": "relogio-quadrado-preto", "cat": "jewel", "sub": "relogio", "real": [109, 184], "name": "Relógio quadrado mostrador preto", "note": "Caixa quadrada, mostrador preto, pulseira de aço", "price": null, "opts": ["Única"]},
@@ -55,31 +77,38 @@
     {"id": "kit-cristais", "cat": "jewel", "sub": "brinco", "real": [111, 136], "name": "Kit de brincos de cristal", "note": "Pontos de luz de cristal", "price": null, "opts": ["Kit"]},
     {"id": "kit-ametista", "cat": "jewel", "sub": "brinco", "real": [114, 134], "name": "Kit de brincos ametista", "note": "Pontos de luz cor ametista", "price": null, "opts": ["Kit"]},
   ];
-  const CAT = { perfume: "Perfume árabe", shoe: "Tênis", jewel: "Bijuteria" };
+  const CAT = { perfume: "Perfume importado", shoe: "Calçado", jewel: "Bijuteria" };
+  const SUBS = [["tenis", "Tênis", "Estilo e performance"], ["sandalia", "Sandálias", "Leveza e sofisticação"], ["sapatilha", "Sapatilhas", "Conforto e elegância"], ["rasteira", "Rasteirinhas", "Praticidade com estilo"], ["salto", "Saltos", "Elegância em alta"]];
   const OPT_LABEL = { perfume: "Volume", shoe: "Numeração", jewel: "Tamanho" };
   const brl = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-  const img = (p) => (p.real ? `/img/bijus/${p.id}.webp` : `/img/${p.id}.webp`);
+  const img = (p) => (p.real ? `/img/bijus/${p.id}.webp` : `/img/p/${p.id}.webp`);
   const priceTxt = (p, q = 1) => (p.price == null ? "Sob consulta" : brl(p.price * q));
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
   // grids
-  for (const grid of $$(".grid[data-cat]")) {
-    for (const p of PRODUCTS.filter((x) => x.cat === grid.dataset.cat)) {
-      const el = document.createElement("article");
-      el.className = "card";
-      if (p.sub) el.dataset.sub = p.sub;
-      el.innerHTML = `
-        <button class="card-media" type="button" data-qv="${p.id}" aria-label="Ver ${p.name}">
-          ${p.real
-            ? `<img src="${img(p)}" alt="${p.name}, foto da peça" loading="lazy" width="${p.real[0]}" height="${p.real[1]}" style="--w:${p.real[0]}px">`
-            : `<img src="${img(p)}" alt="Ilustração 3D: ${p.name}" loading="lazy" width="800" height="1000">`}
-          ${p.tag ? `<span class="card-tag">${p.tag}</span>` : ""}
-        </button>
-        <div class="card-row"><div><h3>${p.name}</h3><div class="note">${p.note}</div></div><span class="price${p.price == null ? " ask" : ""}">${priceTxt(p)}</span></div>
-        <button class="add" type="button" data-qv="${p.id}">${p.opts.length > 1 ? "Escolher" : "Adicionar"}</button>`;
-      grid.appendChild(el);
-    }
+  function card(p) {
+    const el = document.createElement("article");
+    el.className = "card" + (p.wide ? " wide" : "");
+    if (p.sub) el.dataset.sub = p.sub;
+    el.innerHTML = `
+      <button class="card-media" type="button" data-qv="${p.id}" aria-label="Ver ${p.name}">
+        ${p.real
+          ? `<img src="${img(p)}" alt="${p.name}, foto da peça" loading="lazy" width="${p.real[0]}" height="${p.real[1]}" style="--w:${p.real[0]}px">`
+          : `<img src="${img(p)}" alt="${p.name}" loading="lazy">`}
+        ${p.tag ? `<span class="card-tag">${p.tag}</span>` : ""}
+      </button>
+      <div class="card-row"><div><h3>${p.name}</h3><div class="note">${p.note}</div></div><span class="price${p.price == null ? " ask" : ""}">${priceTxt(p)}</span></div>
+      <button class="add" type="button" data-qv="${p.id}">${p.opts.length > 1 ? "Escolher" : "Adicionar"}</button>`;
+    return el;
+  }
+  for (const grid of $$(".grid[data-cat]")) for (const p of PRODUCTS.filter((x) => x.cat === grid.dataset.cat)) grid.appendChild(card(p));
+  const rows = $("[data-shoes]");
+  if (rows) for (const [sub, title, line] of SUBS) {
+    const box = document.createElement("div");
+    box.innerHTML = `<div class="shoe-row-head" id="cat-${sub}"><h3>${title}</h3><span>${line}</span></div><div class="shoe-track"></div>`;
+    for (const p of PRODUCTS.filter((x) => x.cat === "shoe" && x.sub === sub)) box.querySelector(".shoe-track").appendChild(card(p));
+    rows.appendChild(box);
   }
 
   // jewellery filter
@@ -159,7 +188,7 @@
     const p = PRODUCTS.find((x) => x.id === id); if (!p) return;
     cur = p; curOpt = p.opts.length === 1 ? p.opts[0] : null;
     const qi = $("#qv-img");
-    qi.src = img(p); qi.alt = p.real ? `${p.name}, foto da peça` : `Ilustração 3D: ${p.name}`;
+    qi.src = img(p); qi.alt = p.real ? `${p.name}, foto da peça` : p.name;
     qi.classList.toggle("real", !!p.real); qi.style.padding = "";
     $("#qv-cat").textContent = CAT[p.cat];
     $("#qv-title").textContent = p.name;
@@ -228,6 +257,8 @@
       f.style.setProperty("--d", f.dataset.depth);
       return { f, d: +f.dataset.depth, grp: f.dataset.grp, seed: Math.random() * 6.28 };
     });
+    // the main necklace hangs from its clasp: each scroll gives it a push and a damped spring swings it back
+    let sw = 0, swv = 0, lastY = scrollY, lastT = performance.now();
     let tx = 0, ty = 0, px = 0, py = 0;
     addEventListener("pointermove", (e) => { tx = e.clientX / innerWidth - 0.5; ty = e.clientY / innerHeight - 0.5; }, { passive: true });
     addEventListener("deviceorientation", (e) => {
@@ -248,10 +279,14 @@
       const enter = sm(-0.9, 0, -r.top / innerHeight);          // 0 while the section slides in, 1 once pinned
       const focus = sm(0.42, 0.6, p);                            // second step: rings and cuffs come forward
       const sweep = -40 + ((p * 1.6 + t * 0.07) % 1) * 180;      // light band across the gold
+      const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+      const dy = scrollY - lastY; lastY = scrollY;
+      swv += Math.max(-90, Math.min(90, dy)) * 0.9 * amp;
+      swv += (-sw * 38 - swv * 3.2) * dt; sw += swv * dt;
       for (const o of figs) {
         const x = (-px * 34 * o.d + Math.sin(t * 0.5 + o.seed) * 3) * amp;
         const y = ((0.5 - p) * 140 * (o.d - 0.9) + -py * 22 * o.d + Math.cos(t * 0.45 + o.seed) * 4 + (1 - enter) * 90 * o.d) * amp;
-        const rot = (px * 4 * o.d + Math.sin(t * 0.3 + o.seed) * 0.8) * amp;
+        const rot = (px * 4 * o.d + Math.sin(t * 0.3 + o.seed) * 0.8) * amp + (o.grp === "a" ? sw : 0);
         const sc = o.grp === "a" ? 1 - 0.05 * focus : 1 + 0.08 * focus;
         o.f.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
         o.f.style.setProperty("--g", (sweep - o.d * 18).toFixed(1));
