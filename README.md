@@ -35,6 +35,12 @@ Then visit `http://localhost:8080`. Using an HTTP server is recommended for brow
 
 This is a demonstration, not a commercial dealership. Inventory, contacts, and test-drive flows are fictional. The 3D model was adapted from the [automotive-configurator project](https://github.com/codeagencybe/automotive-configurator), originally attributed there to tf3dm.com; license and redistribution terms must be verified before commercial reuse. Lamborghini and Aventador are trademarks of Automobili Lamborghini S.p.A. This project is unaffiliated with the manufacturer.
 
+## Asset provenance and reuse checklist
+
+The earlier project README attributes the adapted 3D vehicle to the [automotive-configurator source repository](https://github.com/codeagencybe/automotive-configurator), which in turn attributes its original model to tf3dm.com. The original documentation states that the GLB was Draco-compressed and that emblems were removed.
+
+**Before reusing or commercially distributing the model:** identify the original asset license and its applicable terms, confirm whether modification and redistribution are allowed, retain any required notices, and replace the asset if the permissions cannot be established. Removing emblems alone does not establish licensing rights.
+
 ## Quality verification
 
 No automated test suite or independently verified performance and accessibility results are claimed in this README. Browser/device checks and licensing review remain open tasks.
