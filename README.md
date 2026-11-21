@@ -41,6 +41,10 @@ The earlier project README attributes the adapted 3D vehicle to the [automotive-
 
 **Before reusing or commercially distributing the model:** identify the original asset license and its applicable terms, confirm whether modification and redistribution are allowed, retain any required notices, and replace the asset if the permissions cannot be established. Removing emblems alone does not establish licensing rights.
 
+## Runtime dependencies and demo behavior
+
+The tracked `index.html` imports Three.js 0.170.0 and its addons from jsDelivr. It first attempts to load the local `./car.glb` model and, on failure, attempts to load the original model from a third-party GitHub raw-content URL. This fallback introduces a network dependency and does **not** resolve asset licensing. The visit form shows a local demonstration confirmation; it does **not** submit a booking to a business backend. If WebGL initialization fails, the page displays a message; successful operation of the remaining content still requires browser testing.
+
 ## Quality verification
 
 No automated test suite or independently verified performance and accessibility results are claimed in this README. Browser/device checks and licensing review remain open tasks.
